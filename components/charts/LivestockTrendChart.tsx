@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { LivestockDataPoint } from '../../types';
@@ -25,9 +26,9 @@ const LivestockTrendChart: React.FC<LivestockTrendChartProps> = ({ data }) => {
               cursor={{ stroke: 'rgba(75, 85, 99, 0.4)' }}
             />
             <Legend wrapperStyle={{ fontSize: '14px' }} />
-            <Line type="monotone" dataKey="sheep" name="ضأن" stroke="#fcd34d" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
-            <Line type="monotone" dataKey="goats" name="ماعز" stroke="#6ee7b7" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
-            <Line type="monotone" dataKey="cows" name="أبقار" stroke="#93c5fd" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+            <Line type="monotone" dataKey="sheep" name="ضأن" stroke="#fcd34d" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} isAnimationActive={false} />
+            <Line type="monotone" dataKey="goats" name="ماعز" stroke="#6ee7b7" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} isAnimationActive={false} />
+            <Line type="monotone" dataKey="cows" name="أبقار" stroke="#93c5fd" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} isAnimationActive={false} />
           </LineChart>
         </ResponsiveContainer>
       </div>

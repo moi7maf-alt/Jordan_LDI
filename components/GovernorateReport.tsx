@@ -1,10 +1,9 @@
+
 import React, { useState, useEffect, ReactNode, useMemo } from 'react';
 import { GovernorateData } from '../types';
 import { generateGovernorateReport } from '../services/geminiService';
 import { Document, Packer, Paragraph, TextRun, AlignmentType, HeadingLevel, IStylesOptions } from 'docx';
 import saveAs from 'file-saver';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import Card from './ui/Card';
 import { POPULATION_DATA_2024 } from '../constants/populationData';
 import { UNEMPLOYMENT_DATA } from '../constants/unemploymentData';
@@ -48,12 +47,12 @@ const ReportSkeleton: React.FC = () => (
 );
 
 const KPICard: React.FC<{ title: string; value: string; icon: ReactNode; color: string; }> = ({ title, value, icon, color }) => (
-    <Card className="card-container text-center">
-        <div className={`mx-auto mb-3 w-12 h-12 flex items-center justify-center rounded-full ${color}`}>
+    <Card className="card-container text-center break-inside-avoid">
+        <div className={`mx-auto mb-3 w-12 h-12 flex items-center justify-center rounded-full ${color} icon-wrapper`}>
             {icon}
         </div>
-        <p className="text-2xl md:text-3xl font-bold text-gray-900">{value}</p>
-        <p className="text-base text-gray-700">{title}</p>
+        <p className="text-2xl md:text-3xl font-bold text-gray-900 kpi-value">{value}</p>
+        <p className="text-base text-gray-700 kpi-title">{title}</p>
     </Card>
 );
 
@@ -67,7 +66,6 @@ const GovernorateReport: React.FC<GovernorateReportProps> = ({ governorate }) =>
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isExportingDocx, setIsExportingDocx] = useState(false);
-    const [isExportingPdf, setIsExportingPdf] = useState(false);
 
     const governorateMetrics = useMemo(() => {
         if (!governorate) return null;
@@ -191,6 +189,23 @@ const GovernorateReport: React.FC<GovernorateReportProps> = ({ governorate }) =>
         fetchReport();
     }, [governorate]);
 
+    const parseReportToElements = (text: string) => {
+        return text.split('\n').map((line, index) => {
+            const trimmed = line.trim();
+            if (!trimmed) return null;
+            if (trimmed.startsWith('###')) {
+                return <h3 key={index} className="text-xl font-bold text-gray-900 mt-6 mb-3 break-after-avoid">{trimmed.replace(/###\s?/, '').replace(/\*\*/g, '')}</h3>;
+            }
+            if (trimmed.startsWith('**') && trimmed.endsWith('**')) {
+                 return <h4 key={index} className="text-lg font-semibold text-gray-800 mt-4 mb-2 break-after-avoid">{trimmed.replace(/\*\*/g, '')}</h4>;
+            }
+            if (trimmed.startsWith('* ')) {
+                 return <li key={index} className="list-disc list-inside text-gray-700 mb-1 break-inside-avoid">{trimmed.substring(2).replace(/\*\*/g, '')}</li>;
+            }
+            return <p key={index} className="text-gray-700 mb-2 leading-relaxed break-inside-avoid">{trimmed.replace(/\*\*/g, '')}</p>;
+        }).filter(Boolean);
+    };
+
     const handleExportDocx = async () => {
         if (!reportContent) return;
         setIsExportingDocx(true);
@@ -243,54 +258,199 @@ const GovernorateReport: React.FC<GovernorateReportProps> = ({ governorate }) =>
         }
     };
     
-    const handleExportPdf = async () => {
-        setIsExportingPdf(true);
-        const input = document.getElementById('report-content');
-        if (!input) {
-            setIsExportingPdf(false);
-            return;
-        }
+    /**
+     * Native Print Solution (Iframe Isolation with CSS Paging Injection and Design Stripping)
+     * 
+     * This method creates a clean, document-oriented print view by:
+     * 1. Removing all shadows, backgrounds, and complex UI styling.
+     * 2. Forcing a 'display: block' flow layout to prevent cutting.
+     * 3. Injecting strict paging rules to avoid breaks inside paragraphs.
+     * 4. HIDING the graphical charts section to avoid rendering issues.
+     * 5. Resizing icons to be small (20px) for a clean list view.
+     */
+    const handleNativePrint = () => {
+        const reportElement = document.getElementById('report-content');
+        
+        if (!reportElement) return;
 
-        try {
-            const canvas = await html2canvas(input, { scale: 2 });
-            const imgData = canvas.toDataURL('image/png');
-            
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
+        // 1. Create a virtual window
+        const printWindow = window.open('', '', 'height=800,width=1000');
+        if (!printWindow) return;
 
-            const topMargin = 20;
-            const bottomMargin = 20;
-            const leftMargin = 15;
-            const rightMargin = 15;
+        // 2. Prepare head with strict CSS for paging and design stripping
+        const headContent = `
+            <head>
+                <title>تقرير ${governorate.name_ar} - ${new Date().toLocaleDateString('ar-JO')}</title>
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+                    
+                    /* RESET & BASICS */
+                    body {
+                        font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        direction: rtl;
+                        padding: 40px;
+                        background-color: white !important;
+                        color: black !important;
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
+                        font-size: 12pt;
+                    }
 
-            const contentWidth = pdfWidth - leftMargin - rightMargin;
-            const pageContentHeight = pdfHeight - topMargin - bottomMargin;
+                    /* DESIGN STRIPPING */
+                    * {
+                        box-shadow: none !important;
+                        text-shadow: none !important;
+                        background-color: transparent !important;
+                        border-radius: 0 !important;
+                        border: none !important;
+                    }
+                    
+                    /* Hide elements marked as no-print (The Charts) */
+                    .no-print {
+                        display: none !important;
+                    }
 
-            const imgWidth = canvas.width;
-            const imgHeight = canvas.height;
-            const ratio = imgWidth / contentWidth;
-            const scaledImgHeight = imgHeight / ratio;
+                    /* LAYOUT FLATTENING */
+                    .grid, .flex, .flex-row, .flex-col {
+                        display: block !important; /* Force flow layout */
+                    }
+                    
+                    /* KPI Cards styling for print */
+                    .card-container {
+                         padding: 10px 0 !important;
+                         border-bottom: 1px solid #eee !important;
+                         margin-bottom: 10px !important;
+                    }
+                    
+                    /* Ensure flexible content within cards is handled */
+                    .card-container .flex {
+                        display: flex !important;
+                        align-items: center !important;
+                        justify-content: space-between !important;
+                    }
+                    
+                    /* RESET ICON CONTAINERS */
+                    .icon-wrapper, .rounded-full {
+                        width: auto !important;
+                        height: auto !important;
+                        padding: 0 10px !important;
+                        margin: 0 !important;
+                        background: none !important;
+                        display: inline-block !important;
+                        min-width: 20px !important;
+                        border: none !important;
+                    }
 
-            let heightLeft = scaledImgHeight;
-            let position = 0;
+                    /* TYPOGRAPHY */
+                    h1 {
+                        font-size: 22pt !important;
+                        font-weight: bold !important;
+                        text-align: center !important;
+                        border-bottom: 2px solid #000 !important;
+                        padding-bottom: 15px !important;
+                        margin-bottom: 30px !important;
+                        color: #000 !important;
+                    }
 
-            pdf.addImage(imgData, 'PNG', leftMargin, topMargin, contentWidth, scaledImgHeight);
-            heightLeft -= pageContentHeight;
+                    h2 {
+                        font-size: 18pt !important;
+                        font-weight: bold !important;
+                        color: #000 !important; 
+                        border-bottom: 1px solid #ccc !important;
+                        padding-bottom: 8px !important;
+                        margin-top: 30px !important;
+                        margin-bottom: 15px !important;
+                        break-after: avoid !important;
+                    }
 
-            while (heightLeft > 0) {
-                position -= pageContentHeight;
-                pdf.addPage();
-                pdf.addImage(imgData, 'PNG', leftMargin, position + topMargin, contentWidth, scaledImgHeight);
-                heightLeft -= pageContentHeight;
-            }
-            
-            pdf.save(`report-${governorate.name}.pdf`);
-        } catch (error) {
-            console.error("Error exporting PDF:", error);
-        } finally {
-            setIsExportingPdf(false);
-        }
+                    h3 {
+                        font-size: 16pt !important;
+                        font-weight: bold !important;
+                        color: #333 !important;
+                        margin-top: 20px !important;
+                        break-after: avoid !important;
+                    }
+                    
+                    h4 {
+                         font-size: 14pt !important;
+                         font-weight: bold !important;
+                         margin-top: 15px !important;
+                    }
+
+                    p, li {
+                        font-size: 12pt !important;
+                        line-height: 1.6 !important;
+                        text-align: justify !important;
+                        margin-bottom: 10px !important;
+                        color: #000 !important;
+                        page-break-inside: avoid !important;
+                    }
+                    
+                    /* KPI Values */
+                    .kpi-value { font-size: 16pt !important; font-weight: bold !important; margin: 0 !important; }
+                    .kpi-title { font-size: 10pt !important; color: #555 !important; }
+
+                     /* ICONS SIZING - Small for text-based report */
+                    svg {
+                        width: 20px !important;
+                        height: 20px !important;
+                        display: inline-block !important;
+                        vertical-align: middle !important;
+                    }
+
+                    .report-header {
+                        text-align: center;
+                        border-bottom: 2px solid #333;
+                        margin-bottom: 30px;
+                        padding-bottom: 20px;
+                    }
+                    
+                    .report-footer {
+                        margin-top: 50px;
+                        text-align: center;
+                        font-size: 12px;
+                        color: #666;
+                        border-top: 1px solid #eee;
+                        padding-top: 10px;
+                    }
+                    
+                    @page {
+                        size: A4;
+                        margin: 15mm 20mm;
+                    }
+                </style>
+            </head>
+        `;
+
+        const date = new Date().toLocaleDateString('ar-JO');
+
+        const htmlContent = `
+            <html>
+                ${headContent}
+                <body>
+                    <div class="report-header">
+                        <h1>تقرير التنمية المستدامة: محافظة ${governorate.name_ar}</h1>
+                        <p style="text-align: center !important;">تاريخ التقرير: ${date} | المصدر: نظام التخطيط الذكي</p>
+                    </div>
+                    <div class="content">
+                        ${reportElement.innerHTML}
+                    </div>
+                    <div class="report-footer">
+                        تم توليد هذا التقرير آلياً بواسطة منظومة التحليل التنموي - وزارة الداخلية.
+                    </div>
+                </body>
+            </html>
+        `;
+
+        printWindow.document.open();
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
+
+        setTimeout(() => {
+            printWindow.focus();
+            printWindow.print();
+            printWindow.close();
+        }, 1000);
     };
     
     if (isLoading) {
@@ -314,7 +474,7 @@ const GovernorateReport: React.FC<GovernorateReportProps> = ({ governorate }) =>
 
     return (
         <div id="report-content" className="space-y-8 p-4 sm:p-8 bg-gray-50 rounded-xl shadow-inner">
-             <div data-html2canvas-ignore="true" className="flex justify-end items-center gap-4 no-print">
+             <div className="flex justify-end items-center gap-4 no-print">
                 <button 
                     onClick={handleExportDocx}
                     disabled={isExportingDocx}
@@ -326,18 +486,17 @@ const GovernorateReport: React.FC<GovernorateReportProps> = ({ governorate }) =>
                     {isExportingDocx ? 'جاري التصدير...' : 'تصدير (DOCX)'}
                 </button>
                 <button
-                    onClick={handleExportPdf}
-                    disabled={isExportingPdf}
+                    onClick={handleNativePrint}
                     className="px-4 py-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-amber-600 focus:z-10 focus:ring-4 focus:ring-gray-100 flex items-center gap-2"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                        <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>
-                    {isExportingPdf ? 'جاري التصدير...' : 'تصدير (PDF)'}
+                    طباعة / حفظ PDF (وثيقة نظيفة)
                 </button>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 pt-4 text-center">{reportTitle}</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <h2 className="text-2xl font-bold text-gray-900 pt-4 text-center break-after-avoid">{reportTitle}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 break-inside-avoid">
                 <KPICard title="عدد السكان (2024)" value={governorateMetrics?.population || 'N/A'} icon={<PopulationIcon />} color="bg-amber-500" />
                 <KPICard title="الكثافة (نسمة/كم²)" value={governorateMetrics?.density || 'N/A'} icon={<DensityIcon />} color="bg-amber-500" />
                 <KPICard title="معدل البطالة (2024)" value={governorateMetrics?.unemployment || 'N/A'} icon={<UnemploymentIcon />} color="bg-amber-500" />
@@ -346,13 +505,11 @@ const GovernorateReport: React.FC<GovernorateReportProps> = ({ governorate }) =>
             
             {reportContent && (
                 <>
-                    <div id="ai-report-text-container" className="mt-8 p-4 bg-white rounded-lg">
-                       <div className="whitespace-pre-wrap font-sans text-lg text-gray-900 leading-normal">
-                          {reportContent}
-                       </div>
+                    <div id="ai-report-text-container" className="mt-8 p-4 bg-white rounded-lg space-y-4 shadow-sm">
+                       {parseReportToElements(reportContent)}
                     </div>
 
-                    <div className="mt-8 pt-8 border-t border-gray-200">
+                    <div className="mt-8 pt-8 border-t border-gray-200 no-print">
                         <h3 className="text-xl font-bold text-gray-900 mb-6 text-center">المؤشرات الرسومية الداعمة</h3>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                             {unemploymentData && (

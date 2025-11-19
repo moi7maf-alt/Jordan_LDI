@@ -1,9 +1,10 @@
+
 import React, { useState, useMemo } from 'react';
 import Card from './ui/Card';
 import { DEVELOPMENT_INDICATORS_2024 } from '../constants/developmentIndexData';
 import { FINAL_RANKING_2024 } from '../constants/finalRankingData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend, Cell, LabelList } from 'recharts';
-import { DevelopmentIndicators2024, FinalRanking2024 } from '../../types';
+import { DevelopmentIndicators2024, FinalRanking2024 } from '../types';
 import { GOVERNORATE_COLORS } from '../constants/colors';
 
 const indicators = [

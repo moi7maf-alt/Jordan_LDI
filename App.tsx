@@ -18,8 +18,7 @@ import PredictiveAnalysis from './components/PredictiveAnalysis';
 import Header from './components/Header';
 import DataSources from './components/DataSources';
 import SocialDevelopment from './components/SocialDevelopment';
-
-export type View = 'dashboard' | 'womens_development' | 'education' | 'health' | 'agricultural_development' | 'income' | 'local_administration' | 'security' | 'chatbot' | 'reports' | 'development_plan' | 'water' | 'local_development_index' | 'predictive_analysis' | 'data_sources' | 'social_development';
+import { View } from './types';
 
 const App: React.FC = () => {
   const [activeView, setActiveView] = useState<View>('dashboard');

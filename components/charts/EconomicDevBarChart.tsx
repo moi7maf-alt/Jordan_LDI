@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { EconomicDevDataPoint } from '../../types';
@@ -32,8 +33,8 @@ const EconomicDevBarChart: React.FC<EconomicDevBarChartProps> = ({ data }) => {
               cursor={{ fill: 'rgba(75, 85, 99, 0.2)' }}
             />
             <Legend wrapperStyle={{ fontSize: '14px' }} />
-            <Bar dataKey="2023" fill="#c7d2fe" name="2023" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="2024" fill="#a5b4fc" name="2024" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="2023" fill="#c7d2fe" name="2023" radius={[4, 4, 0, 0]} isAnimationActive={false} />
+            <Bar dataKey="2024" fill="#a5b4fc" name="2024" radius={[4, 4, 0, 0]} isAnimationActive={false} />
           </BarChart>
         </ResponsiveContainer>
       </div>

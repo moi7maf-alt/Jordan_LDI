@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import Card from './ui/Card';
 import { AI_PREDICTIVE_ANALYSIS_DATA, GOVERNORATES_DATA } from '../constants';
@@ -49,10 +50,10 @@ const AiPredictiveAnalysisTable: React.FC = () => {
                     <thead className="text-xs text-gray-800 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
                             <th scope="col" className="px-4 py-3 w-[15%]">القطاع</th>
-                            <th scope="col" className="px-4 py-3 w-[20%]">الاتجاه التنبؤي (2025 - 2028)</th>
-                            <th scope="col" className="px-4 py-3 w-[20%]">التحليل التنبؤي بناءً على البيانات المدخلة</th>
-                            <th scope="col" className="px-4 py-3 w-[22.5%]">الحلول التقليدية (البنيوية والإدارية)</th>
-                            <th scope="col" className="px-4 py-3 w-[22.5%]">الحلول الذكية (AI/IoT) القابلة للتطبيق</th>
+                            <th scope="col" className="px-4 py-3 w-[20%]">الاتجاه التنبؤي (صعود/هبوط/تحسن)</th>
+                            <th scope="col" className="px-4 py-3 w-[20%]">التحليل التنبؤي (الأسباب والعوامل)</th>
+                            <th scope="col" className="px-4 py-3 w-[22.5%]">الحلول التقليدية (تخفيف الأثر)</th>
+                            <th scope="col" className="px-4 py-3 w-[22.5%]">حلول إبداعية/ذكية (خارج الصندوق)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -61,10 +62,10 @@ const AiPredictiveAnalysisTable: React.FC = () => {
                                 <th scope="row" className="px-4 py-4 font-semibold text-gray-900 whitespace-nowrap dark:text-white">
                                     <span className="text-lg mr-2">{item.icon}</span> {item.sector}
                                 </th>
-                                <td className="px-4 py-4 leading-relaxed">{item.trend}</td>
-                                <td className="px-4 py-4 leading-relaxed">{item.analysis}</td>
+                                <td className="px-4 py-4 leading-relaxed font-medium text-amber-700 dark:text-amber-500">{item.trend}</td>
+                                <td className="px-4 py-4 leading-relaxed text-gray-700 dark:text-gray-300">{item.analysis}</td>
                                 <td className="px-4 py-4 leading-relaxed"><RichTextParser text={item.traditional_solutions} /></td>
-                                <td className="px-4 py-4 leading-relaxed"><RichTextParser text={item.ai_solutions} /></td>
+                                <td className="px-4 py-4 leading-relaxed bg-blue-50 dark:bg-blue-900/20"><RichTextParser text={item.ai_solutions} /></td>
                             </tr>
                         ))}
                     </tbody>
@@ -109,10 +110,10 @@ const AiPredictiveAnalysisCards: React.FC = () => {
                         <div className="space-y-4">
                             <div className="border-b border-gray-200 dark:border-gray-700 pb-3">
                                 <h4 className="font-semibold text-amber-600 dark:text-amber-400 mb-1">الاتجاه التنبؤي</h4>
-                                <p className="text-sm leading-relaxed">{item.trend}</p>
+                                <p className="text-sm leading-relaxed font-medium">{item.trend}</p>
                             </div>
                             <div className="border-b border-gray-200 dark:border-gray-700 pb-3">
-                                <h4 className="font-semibold text-amber-600 dark:text-amber-400 mb-1">التحليل</h4>
+                                <h4 className="font-semibold text-amber-600 dark:text-amber-400 mb-1">التحليل والأسباب</h4>
                                 <p className="text-sm leading-relaxed">{item.analysis}</p>
                             </div>
 
@@ -123,7 +124,7 @@ const AiPredictiveAnalysisCards: React.FC = () => {
                                     className="w-full flex justify-between items-center text-right p-3 bg-gray-100 dark:bg-slate-700 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
                                     aria-expanded={!!openSections[index]?.traditional}
                                 >
-                                    <span className="font-semibold">الحلول التقليدية</span>
+                                    <span className="font-semibold">الحلول التقليدية (تخفيف الأثر)</span>
                                     <svg className={`w-5 h-5 transition-transform duration-200 ${openSections[index]?.traditional ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </button>
                                 {openSections[index]?.traditional && (
@@ -137,14 +138,14 @@ const AiPredictiveAnalysisCards: React.FC = () => {
                             <div>
                                 <button
                                     onClick={() => toggleSection(index, 'ai')}
-                                    className="w-full flex justify-between items-center text-right p-3 bg-gray-100 dark:bg-slate-700 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                                    className="w-full flex justify-between items-center text-right p-3 bg-blue-100 dark:bg-blue-900 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
                                     aria-expanded={!!openSections[index]?.ai}
                                 >
-                                    <span className="font-semibold">الحلول الذكية (AI/IoT)</span>
-                                     <svg className={`w-5 h-5 transition-transform duration-200 ${openSections[index]?.ai ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    <span className="font-semibold text-blue-900 dark:text-blue-100">حلول إبداعية/ذكية</span>
+                                     <svg className={`w-5 h-5 transition-transform duration-200 ${openSections[index]?.ai ? 'rotate-180' : ''} text-blue-900 dark:text-blue-100`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </button>
                                 {openSections[index]?.ai && (
-                                     <div className="p-3 mt-2 border-r-2 border-amber-500 mr-2 text-sm leading-relaxed bg-white dark:bg-slate-800 rounded-md">
+                                     <div className="p-3 mt-2 border-r-2 border-blue-500 mr-2 text-sm leading-relaxed bg-blue-50 dark:bg-slate-800 rounded-md">
                                         <RichTextParser text={item.ai_solutions} />
                                     </div>
                                 )}

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { View } from '../App';
+import { View } from '../types';
 
 const IconBase: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

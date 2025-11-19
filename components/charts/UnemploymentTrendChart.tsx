@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { UnemploymentDataPoint } from '../../types';
@@ -32,7 +33,8 @@ const UnemploymentTrendChart: React.FC<UnemploymentTrendChartProps> = ({ data, h
             stroke="#fca5a5" 
             strokeWidth={3} 
             dot={{ r: 5 }} 
-            activeDot={{ r: 7 }} 
+            activeDot={{ r: 7 }}
+            isAnimationActive={false}
           />
         </LineChart>
       </ResponsiveContainer>

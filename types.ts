@@ -1,4 +1,7 @@
+
 // types.ts
+
+export type View = 'dashboard' | 'womens_development' | 'education' | 'health' | 'agricultural_development' | 'income' | 'local_administration' | 'security' | 'chatbot' | 'reports' | 'development_plan' | 'water' | 'local_development_index' | 'predictive_analysis' | 'data_sources' | 'social_development';
 
 export interface GovernorateData {
   name: string;
