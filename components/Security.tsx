@@ -9,13 +9,10 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Document, Packer, Paragraph, TextRun, AlignmentType, IStylesOptions } from 'docx';
 import saveAs from 'file-saver';
 
-type ContentBlock = { type: 'h1' | 'h2' | 'h3' | 'p' | 'list-item'; text: string; };
-
 const Security: React.FC = () => {
     const [isExportingDocx, setIsExportingDocx] = useState(false);
 
     const securityIndicators = useMemo(() => {
-        // Defines the mapping from a governorate to its constituent police directorates/regions.
         const governoratePoliceRegionMapping: { [key: string]: string[] } = {
             Amman: ['وسط عمان', 'جنوب عمان', 'شمال عمان', 'شرق عمان', 'البادية الوسطى'],
             Balqa: ['البلقاء', 'غرب البلقاء'],
@@ -33,7 +30,6 @@ const Security: React.FC = () => {
 
         const crimeDataMap = new Map(CRIME_DATA_2024.map(d => [d.region, d]));
 
-        // Aggregate police directorate data into governorate-level data.
         const governorateData = POPULATION_DATA_2024.filter(p => p.area > 0).map(pop => {
             const policeRegionsForGov = governoratePoliceRegionMapping[pop.name] || [];
             
@@ -53,9 +49,8 @@ const Security: React.FC = () => {
             const total_accidents = trafficData?.total || 0;
             
             const crime_rate = (total_crimes / pop.population) * 100000;
-            const accident_rate = (total_accidents / pop.population) * 100000;
+            const accident_rate = ((trafficData?.total || 0) / pop.population) * 100000;
             const drug_crime_rate = (total_drug_crimes / pop.population) * 100000;
-            // Calculate the weighted average for the clearance rate
             const clearance_rate = total_crimes > 0 ? (weighted_clearance / total_crimes) * 100 : 0;
 
             return {
@@ -72,7 +67,6 @@ const Security: React.FC = () => {
             };
         });
 
-        // Calculate Safety Score
         const crimeRates = governorateData.map(g => g.crime_rate).filter(v => v > 0);
         const maxCrimeRate = Math.max(...crimeRates);
         const minCrimeRate = Math.min(...crimeRates);
@@ -117,41 +111,10 @@ const Security: React.FC = () => {
         };
     }, [securityIndicators]);
 
-
-    const generateReportContent = (): ContentBlock[] => [
-        { type: 'h1', text: "تقرير تحليلي استراتيجي للوضع الأمني في المملكة" },
-        { type: 'p', text: "يقدم هذا التقرير نظرة شاملة ومعمقة على مؤشرات الجريمة والسلامة العامة في محافظات الأردن لعام 2024، بهدف تحديد مواطن القوة والتحديات، وتقديم توصيات استراتيجية لدعم صناع القرار في تعزيز الأمن المجتمعي." },
-        
-        { type: 'h2', text: "1. مؤشر الأمان المجتمعي وتصنيف المحافظات" },
-        { type: 'p', text: "لتقديم رؤية متكاملة، تم تطوير 'مؤشر الأمان المجتمعي' الذي يدمج عدة مقاييس رئيسية: معدل الجريمة (لكل 100 ألف نسمة)، معدل حوادث السير (لكل 100 ألف نسمة)، ومعدل اكتشاف الجرائم. يمنح المؤشر درجة لكل محافظة، مما يتيح تصنيفاً موضوعياً لمستوى الأمان النسبي." },
-        { type: 'p', text: `تتصدر القائمة محافظة **${securityIndicators[0].name_ar}** كالأكثر أماناً، تليها **${securityIndicators[1].name_ar}** و **${securityIndicators[2].name_ar}**. هذا الأداء المتميز يعكس انخفاضاً نسبياً في معدلات الجريمة والحوادث، وكفاءة عالية في اكتشاف الجرائم. في المقابل، تظهر محافظات مثل **${securityIndicators[securityIndicators.length - 1].name_ar}** تحديات أكبر تتطلب تدخلاً موجهاً.` },
-
-        { type: 'h2', text: "2. تحليل معمق لمؤشرات الجريمة" },
-        { type: 'p', text: "عند تحليل معدلات الجريمة المنسوبة لعدد السكان، تظهر **العاصمة** أعلى معدل، وهو أمر متوقع نظراً للكثافة السكانية والنشاط الاقتصادي. ومع ذلك، يبرز مؤشر 'اكتشاف الجرائم' كفاءة عالية للأجهزة الأمنية في العاصمة، مما يعكس قدرة على التعامل مع حجم الجرائم. اللافت للنظر هو ارتفاع معدل جرائم المخدرات في **العقبة**، والذي قد يرتبط بموقعها كميناء حدودي، مما يجعلها نقطة عبور ومكافحة رئيسية." },
-        
-        { type: 'h2', text: "3. تحليل السلامة المرورية" },
-        { type: 'p', text: "تتركز حوادث السير بشكل كبير في المحافظات ذات الكثافة السكانية العالية والطرق الحيوية مثل **العاصمة** و**إربد**. تحليل أنواع الحوادث يكشف أن حوادث 'الصدم' و'الدهس' تشكل النسبة الأكبر، مما يستدعي التركيز على السلامة داخل المدن وحماية المشاة." },
-
-        { type: 'h2', text: "4. توصيات استراتيجية لتعزيز الأمن المجتمعي" },
-        { type: 'h3', text: "أ. تعزيز القدرات الأمنية الموجهة:" },
-        { type: 'list-item', text: "توجيه الموارد: تركيز الجهود والموارد البشرية والتقنية في المحافظات ذات معدلات الجريمة الأعلى (مثل العاصمة والزرقاء) مع تحليل جغرافي دقيق 'للبؤر الساخنة' داخل هذه المحافظات." },
-        { type: 'list-item', text: "مكافحة المخدرات: تكثيف العمليات الاستخباراتية والرقابية في المنافذ الحدودية والمناطق الاستراتيجية كالعقبة والمفرق لمكافحة جرائم الاتجار." },
-        { type: 'h3', text: "ب. الوقاية المجتمعية:" },
-        { type: 'list-item', text: "برامج الشباب: إطلاق برامج توعية ومبادرات شبابية في المناطق التي يرتفع بها معدل جرائم الأحداث، بالتعاون مع وزارة التنمية الاجتماعية والمنظمات المحلية." },
-        { type: 'list-item', text: "الشراكة المجتمعية: تفعيل دور لجان الشرطة المجتمعية في الأحياء لتعزيز الثقة وفتح قنوات تواصل مباشرة للإبلاغ عن المخاطر الأمنية." },
-        { type: 'h3', text: "ج. السلامة المرورية:" },
-        { type: 'list-item', text: "هندسة الطرق: مراجعة وتطوير البنية التحتية للطرق في النقاط التي تتكرر بها الحوادث، خاصة فيما يتعلق بممرات المشاة والإشارات الضوئية." },
-        { type: 'list-item', text: "حملات توعية: إطلاق حملات إعلامية موجهة ومبتكرة تستهدف السلوكيات الأكثر تسبباً للحوادث (مثل استخدام الهاتف أثناء القيادة) في المحافظات الأكثر تأثراً." },
-        { type: 'h3', text: "د. التكنولوجيا والبيانات:" },
-        { type: 'list-item', text: "التحليل التنبؤي: الاستثمار في أنظمة تحليل البيانات والذكاء الاصطناعي للتنبؤ بالمناطق والأوقات التي يرتفع فيها احتمال وقوع الجرائم، مما يسمح بتوجيه الدوريات بشكل استباقي وفعال." },
-    ];
-    
-    const analysisText = generateReportContent();
-
     const handleExportDocx = async () => {
         setIsExportingDocx(true);
         try {
-            const title = "تقرير الوضع الأمني في المملكة 2024";
+            const title = "التقرير الأمني الاستراتيجي 2024";
             
             const docStyles: IStylesOptions = {
                 default: { document: { run: { font: "Arial", size: 24, rightToLeft: true } } },
@@ -159,33 +122,31 @@ const Security: React.FC = () => {
                     { id: "Normal", name: "Normal", run: { size: 24 }, paragraph: { spacing: { after: 120 }, alignment: AlignmentType.RIGHT } },
                     { id: "h1", name: "h1", run: { size: 32, bold: true, color: "2E74B5" }, paragraph: { alignment: AlignmentType.CENTER, spacing: { before: 240, after: 120 } } },
                     { id: "h2", name: "h2", run: { size: 28, bold: true, color: "4F81BD" }, paragraph: { spacing: { before: 240, after: 120 }, alignment: AlignmentType.RIGHT } },
-                    { id: "h3", name: "h3", run: { size: 26, bold: true, color: "1F497D" }, paragraph: { spacing: { before: 180, after: 120 }, alignment: AlignmentType.RIGHT } },
-                    { id: "list-item", name: "list-item", run: { size: 24 }, paragraph: { bullet: { level: 0 }, spacing: { after: 120 }, alignment: AlignmentType.RIGHT } },
                 ],
             };
 
-            const paragraphs: Paragraph[] = analysisText.map(block => {
-                return new Paragraph({
-                    children: [new TextRun(block.text)],
-                    style: block.type,
-                    bidirectional: true,
-                });
-            });
+            const children = [
+                new Paragraph({ text: title, style: "h1" }),
+                
+                new Paragraph({ text: "1. مقدمة استراتيجية", style: "h2" }),
+                new Paragraph({ text: `شهد عام 2024 تسجيل ${nationalTotals.crimes.toLocaleString()} جريمة و ${nationalTotals.accidents.toLocaleString()} حادث سير. يعكس التقرير حالة من الاستقرار الأمني العام، مع معدل كشف للجرائم بلغ ${nationalTotals.clearance_rate.toFixed(1)}%، مما يدل على كفاءة عالية للأجهزة الأمنية. ومع ذلك، تبرز تحديات نوعية تتعلق بالجرائم المستحدثة وحوادث السير التي تستنزف الموارد البشرية والاقتصادية.`, style: "Normal" }),
 
-            // Add KPI summary at the beginning
-            const kpiSummary = [
-                new Paragraph({ text: `إجمالي الجرائم: ${nationalTotals.crimes.toLocaleString()}`, style: "Normal", bullet: { level: 0 } }),
-                new Paragraph({ text: `إجمالي حوادث السير: ${nationalTotals.accidents.toLocaleString()}`, style: "Normal", bullet: { level: 0 } }),
-                new Paragraph({ text: `معدل الاكتشاف: ${nationalTotals.clearance_rate.toFixed(1)}%`, style: "Normal", bullet: { level: 0 } }),
-                new Paragraph({ text: "", style: "Normal" }) // Spacer
+                new Paragraph({ text: "2. الجريمة: تحليل النوع والتوزيع الجغرافي", style: "h2" }),
+                new Paragraph({ text: "الجريمة العامة: تسجل العاصمة والبلقاء معدلات جريمة مرتفعة نسبياً عند قياسها بعدد السكان، وهو انعكاس طبيعي للتحضر والكثافة. ومع ذلك، فإن نسب الاكتشاف المرتفعة (التي تتجاوز 96% في معظم الأقاليم) تؤكد على كفاءة المنظومة الشرطية والتحقيقية.", style: "Normal" }),
+                new Paragraph({ text: "التهديد النوعي (المخدرات): يُعد هذا الملف الأخطر استراتيجياً. تظهر بيانات العقبة (معدل 49 جريمة مخدرات لكل 100 ألف نسمة) والمفرق مؤشرات مقلقة للغاية. العقبة كميناء بحري، والمفرق كمنطقة حدودية برية شاسعة، لا تعانيان فقط من 'التعاطي' بل تشكلان خطوط تماس لجرائم 'الاتجار والتهريب'. ارتفاع المعدلات هنا ليس مجرد خلل اجتماعي، بل تهديد للأمن الوطني يتطلب مقاربة تتجاوز المكافحة الشرطية إلى الجهد الاستخباري وضبط الحدود.", style: "Normal" }),
+
+                new Paragraph({ text: "3. السلامة المرورية: حرب الطرق الصامتة", style: "h2" }),
+                new Paragraph({ text: "تُشير البيانات إلى أن حوادث السير تستنزف الموارد بشكل يفوق الجرائم الجنائية في بعض المناطق. بينما تسجل العاصمة العدد الأكبر من الحوادث (5,113 حادث)، فإن 'خطورة' الحوادث تتركز في محافظات الجنوب وعلى الطرق الخارجية (العقبة: 49 حادث لكل 100 ألف نسمة)، حيث السرعات العالية والشاحنات الثقيلة تحول أي حادث إلى كارثة مميتة. في المدن المكتظة كإربد والزرقاء، تبرز حوادث 'الدهس' كظاهرة مقلقة تعكس ضعف البنية التحتية للمشاة.", style: "Normal" }),
+
+                new Paragraph({ text: "4. التوصيات الاستراتيجية", style: "h2" }),
+                new Paragraph({ text: "أولاً: تعزيز المنظومة الأمنية في العقبة والمفرق بتقنيات مسح متقدمة (X-ray scanners) وزيادة الكوادر الاستخبارية لتفكيك شبكات التهريب.", style: "Normal", bullet: { level: 0 } }),
+                new Paragraph({ text: "ثانياً: توظيف خوارزميات الذكاء الاصطناعي لتحليل أنماط الجريمة في بؤر التوتر (Hotspots) في العاصمة والزرقاء، وتوجيه الدوريات استباقياً.", style: "Normal", bullet: { level: 0 } }),
+                new Paragraph({ text: "ثالثاً: توسيع نطاق الرقابة الآلية (الكاميرات الذكية) لرصد المخالفات الخطرة (السرعة، الهاتف) على الطرق الخارجية المؤدية للجنوب.", style: "Normal", bullet: { level: 0 } }),
             ];
 
             const doc = new Document({
                 styles: docStyles,
-                sections: [{ 
-                    properties: { page: { margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 } } }, 
-                    children: [ ...kpiSummary, ...paragraphs] 
-                }],
+                sections: [{ properties: { page: { margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 } } }, children }],
             });
 
             const blob = await Packer.toBlob(doc);
@@ -208,36 +169,32 @@ const Security: React.FC = () => {
             <head>
                 <title>تقرير الوضع الأمني - 2024</title>
                 <style>
-                    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+                    @import url('https://fonts.googleapis.com/css2?family=Traditional+Arabic:wght@400;700&display=swap');
                     body {
-                        font-family: 'Cairo', sans-serif;
+                        font-family: 'Traditional Arabic', serif;
                         direction: rtl;
                         padding: 40px;
                         background: white !important;
                         color: black !important;
-                        font-size: 14pt;
+                        font-size: 16pt;
+                        line-height: 1.6;
                     }
-                    * {
-                        box-shadow: none !important;
-                        background: transparent !important;
-                        border-radius: 0 !important;
-                        border: none !important;
-                    }
-                    .grid, .flex { display: block !important; }
-                    .no-print, .recharts-wrapper, button { display: none !important; }
+                    .no-print, .recharts-wrapper, button, select, svg, .icon-container, .kpi-card-visual { display: none !important; }
                     
                     .card-container {
+                        box-shadow: none !important;
+                        border: none !important;
                         padding: 0 !important;
-                        margin: 0 0 20px 0 !important;
-                        border-bottom: 1px solid #eee !important;
+                        margin-bottom: 20px !important;
+                        break-inside: avoid;
                     }
                     
-                    h1 { font-size: 26pt !important; text-align: center; border-bottom: 2px solid black; margin-bottom: 20px; }
-                    h2 { font-size: 20pt !important; border-bottom: 1px solid #ccc; margin-top: 30px; break-after: avoid; }
-                    h3 { font-size: 18pt !important; color: #333; margin-top: 20px; break-after: avoid; }
-                    p, li { font-size: 14pt !important; line-height: 1.6; text-align: justify; }
+                    h1 { font-size: 28pt; font-weight: bold; text-align: center; border-bottom: 3px solid #000; margin-bottom: 30px; padding-bottom: 10px; }
+                    h2 { font-size: 22pt; font-weight: bold; border-bottom: 1px solid #666; margin-top: 30px; margin-bottom: 15px; }
+                    h3 { font-size: 18pt; font-weight: bold; margin-top: 20px; }
+                    p, li { text-align: justify; margin-bottom: 12px; }
                     
-                    @page { size: A4; margin: 20mm; }
+                    @page { size: A4; margin: 2.5cm; }
                 </style>
             </head>
         `;
@@ -247,13 +204,13 @@ const Security: React.FC = () => {
                 ${headContent}
                 <body>
                     <div class="report-header">
-                        <h1>تقرير تحليلي استراتيجي للوضع الأمني في المملكة</h1>
+                        <h1>التقرير الأمني الاستراتيجي: الجريمة والسلامة العامة</h1>
                     </div>
                     <div class="content">
                         ${reportElement.innerHTML}
                     </div>
-                     <div class="report-footer" style="text-align: center; margin-top: 50px; font-size: 10pt; color: #666;">
-                        وزارة الداخلية - منظومة التحليل التنموي
+                     <div class="report-footer" style="text-align: center; margin-top: 50px; font-size: 12pt; color: #666; border-top: 1px solid #ccc; padding-top: 10px;">
+                        وزارة الداخلية - مديرية التنمية المحلية | منظومة التحليل الرقمي
                     </div>
                 </body>
             </html>
@@ -278,26 +235,22 @@ const Security: React.FC = () => {
                     disabled={isExportingDocx}
                     className="px-4 py-2 text-sm font-medium text-black bg-amber-500 rounded-lg hover:bg-amber-600 focus:ring-4 focus:outline-none focus:ring-amber-300 disabled:bg-gray-400 flex items-center gap-2"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                    {isExportingDocx ? 'جاري التصدير...' : 'تصدير (DOCX)'}
+                    تصدير (DOCX)
                 </button>
                 <button onClick={handleNativePrint} className="px-4 py-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-amber-600 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                        طباعة / حفظ PDF (وثيقة نظيفة)
+                        طباعة (تقرير نصي)
                 </button>
             </div>
             
             <div id="report-content" className="space-y-8">
                 <header className="text-center">
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{analysisText[0].text}</h1>
-                    <p className="text-lg text-gray-700 dark:text-gray-400 mt-2 max-w-3xl mx-auto">{analysisText[1].text}</p>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">التقرير الاستراتيجي للوضع الأمني والسلامة العامة 2024</h1>
+                    <p className="text-lg text-gray-700 dark:text-gray-400 mt-2 max-w-3xl mx-auto">
+                        يُقدم هذا التقرير تشخيصاً دقيقاً ومعمقاً للحالة الأمنية في المملكة، مستنداً إلى بيانات مديرية الأمن العام لعام 2024.
+                    </p>
                 </header>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 kpi-card-visual">
                     <Card className="card-container flex flex-col justify-center items-center text-center break-inside-avoid">
                         <h3 className="text-md font-semibold text-gray-800 dark:text-gray-300">إجمالي الجرائم (2024)</h3>
                         <p className="text-3xl font-bold text-red-500 my-2">{nationalTotals.crimes.toLocaleString()}</p>
@@ -313,8 +266,12 @@ const Security: React.FC = () => {
                 </div>
 
                 <Card className="card-container">
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{analysisText[2].text}</h2>
-                    <div className="prose-lg dark:prose-invert max-w-none text-gray-800 dark:text-gray-300" dangerouslySetInnerHTML={{ __html: `<p>${analysisText[3].text}</p><p>${analysisText[4].text}</p>`}}></div>
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">1. مؤشر الأمان المجتمعي المركب</h2>
+                    <div className="text-gray-800 dark:text-gray-300 leading-relaxed text-lg">
+                        <p>
+                            لتوفير أداة تقييم موحدة، قمنا بتطوير "مؤشر الأمان المجتمعي" الذي يدمج ثلاثة أبعاد حرجة: كثافة الجريمة (معدل الجريمة لكل 100 ألف نسمة)، خطورة الطرق (معدل الحوادث)، وفاعلية الردع (معدل اكتشاف الجريمة). يكشف المؤشر عن تفوق أمني لمحافظات <strong>{securityIndicators[0].name_ar}</strong> و<strong>{securityIndicators[1].name_ar}</strong>، بينما تواجه محافظات <strong>{securityIndicators[securityIndicators.length - 1].name_ar}</strong> و<strong>{securityIndicators[securityIndicators.length - 2].name_ar}</strong> تحديات هيكلية تتطلب حزماً أمنية خاصة.
+                        </p>
+                    </div>
                     <div className="mt-6 no-print" style={{ width: '100%', height: 450 }}>
                         <ResponsiveContainer>
                             <BarChart data={securityIndicators} margin={{ top: 20, right: 30, left: 0, bottom: 60 }}>
@@ -331,106 +288,49 @@ const Security: React.FC = () => {
                     </div>
                 </Card>
 
-                <div className="page-break" />
-
                 <Card className="card-container">
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{analysisText[5].text}</h2>
-                    <div className="prose-lg dark:prose-invert max-w-none text-gray-800 dark:text-gray-300" dangerouslySetInnerHTML={{ __html: `<p>${analysisText[6].text}</p>`}}></div>
-                </Card>
-
-                <Card className="card-container">
-                    <h3 className="text-lg font-semibold text-center text-gray-900 dark:text-white mb-4">معدل الجريمة (لكل 100 ألف نسمة)</h3>
-                    <div style={{ width: '100%', height: 450 }} className="no-print">
-                        <ResponsiveContainer>
-                            <BarChart data={[...securityIndicators].sort((a,b) => b.crime_rate - a.crime_rate)} margin={{ top: 20, right: 30, left: 0, bottom: 60 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(128, 128, 128, 0.2)" />
-                                <XAxis dataKey="name_ar" interval={0} angle={-45} textAnchor="end" height={70} tick={{ fontSize: 12, fill: '#1f2937' }} />
-                                <YAxis tick={{ fontSize: 12, fill: '#1f2937' }} />
-                                <Tooltip contentStyle={{ backgroundColor: 'rgba(31, 41, 55, 0.8)'}} formatter={(value: number) => [value.toFixed(1), 'معدل الجريمة']} />
-                                <Bar dataKey="crime_rate" fill="#be123c" name="معدل الجريمة" radius={[4, 4, 0, 0]}>
-                                    <LabelList dataKey="crime_rate" position="top" formatter={(value: number) => value.toFixed(1)} style={{ fill: '#1f2937', fontSize: '11px' }} />
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">2. الجريمة: تحليل النوع والتوزيع الجغرافي</h2>
+                    <div className="text-gray-800 dark:text-gray-300 leading-relaxed text-lg">
+                        <p className="mb-4">
+                            <strong>الجريمة العامة:</strong> تسجل العاصمة والبلقاء معدلات جريمة مرتفعة نسبياً عند قياسها بعدد السكان، وهو انعكاس طبيعي للتحضر والكثافة. ومع ذلك، فإن نسب الاكتشاف المرتفعة (التي تتجاوز 96% في معظم الأقاليم) تؤكد على كفاءة المنظومة الشرطية والتحقيقية وقدرتها على احتواء الجريمة التقليدية.
+                        </p>
+                        <p>
+                            <strong>التهديد النوعي (المخدرات):</strong> يُعد هذا الملف الأخطر استراتيجياً. تظهر بيانات <strong>العقبة</strong> (معدل 49 جريمة مخدرات لكل 100 ألف نسمة) و<strong>المفرق</strong> مؤشرات مقلقة للغاية. العقبة كميناء بحري، والمفرق كمنطقة حدودية برية شاسعة، لا تعانيان فقط من "التعاطي" بل تشكلان خطوط تماس لجرائم "الاتجار والتهريب". ارتفاع المعدلات هنا ليس مجرد خلل اجتماعي، بل تهديد للأمن الوطني يتطلب مقاربة تتجاوز المكافحة الشرطية إلى الجهد الاستخباري وضبط الحدود.
+                        </p>
                     </div>
                 </Card>
 
                 <Card className="card-container">
-                    <h3 className="text-lg font-semibold text-center text-gray-900 dark:text-white mb-4">معدل اكتشاف الجرائم (%)</h3>
-                    <div style={{ width: '100%', height: 450 }} className="no-print">
-                        <ResponsiveContainer>
-                            <BarChart data={[...securityIndicators].sort((a,b) => b.clearance_rate - a.clearance_rate)} margin={{ top: 20, right: 30, left: 0, bottom: 60 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(128, 128, 128, 0.2)" />
-                                <XAxis dataKey="name_ar" interval={0} angle={-45} textAnchor="end" height={70} tick={{ fontSize: 12, fill: '#1f2937' }} />
-                                <YAxis domain={[80, 100]} unit="%" tick={{ fontSize: 12, fill: '#1f2937' }} />
-                                <Tooltip contentStyle={{ backgroundColor: 'rgba(31, 41, 55, 0.8)'}} formatter={(value: number) => [`${value.toFixed(1)}%`, 'معدل الاكتشاف']} />
-                                <Bar dataKey="clearance_rate" fill="#059669" name="معدل الاكتشاف" radius={[4, 4, 0, 0]}>
-                                    <LabelList dataKey="clearance_rate" position="top" formatter={(value: number) => `${value.toFixed(1)}%`} style={{ fill: '#1f2937', fontSize: '11px' }} />
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">3. السلامة المرورية: حرب الطرق الصامتة</h2>
+                    <div className="text-gray-800 dark:text-gray-300 leading-relaxed text-lg">
+                        <p>
+                            تُشير البيانات إلى أن حوادث السير تستنزف الموارد البشرية والاقتصادية بشكل يفوق الجرائم الجنائية في بعض المناطق. بينما تسجل العاصمة العدد الأكبر من الحوادث (بسبب الازدحام)، فإن "خطورة" الحوادث تتركز في محافظات الجنوب (معان، العقبة) وعلى الطرق الخارجية، حيث السرعات العالية والشاحنات الثقيلة تحول أي حادث إلى كارثة مميتة. في المدن المكتظة كإربد والزرقاء، تبرز حوادث "الدهس" كظاهرة مقلقة تعكس ضعف البنية التحتية للمشاة والثقافة المرورية.
+                        </p>
                     </div>
                 </Card>
 
                 <Card className="card-container">
-                    <h3 className="text-lg font-semibold text-center text-gray-800 dark:text-white mb-2">تحليل جرائم المخدرات حسب المنطقة الأمنية (2024)</h3>
-                    <div className="no-print">
-                        <CrimeBreakdownChart data={CRIME_DATA_2024} key1="drug_trafficking" key2="drug_possession_use" name1="اتجار" name2="حيازة وتعاطي" color1="#9333ea" color2="#c084fc" />
-                    </div>
-                </Card>
-                
-                <div className="page-break" />
-
-                <Card className="card-container">
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{analysisText[7].text}</h2>
-                    <div className="prose-lg dark:prose-invert max-w-none text-gray-800 dark:text-gray-300" dangerouslySetInnerHTML={{ __html: `<p>${analysisText[8].text}</p>`}}></div>
-                </Card>
-                
-                <Card className="card-container">
-                    <h3 className="text-lg font-semibold text-center text-gray-900 dark:text-white mb-2">معدل حوادث السير (لكل 100 ألف نسمة)</h3>
-                    <div style={{ width: '100%', height: 450 }} className="no-print">
-                        <ResponsiveContainer>
-                            <BarChart data={[...securityIndicators].sort((a,b) => b.accident_rate - a.accident_rate)} margin={{ top: 20, right: 30, left: 0, bottom: 60 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(128, 128, 128, 0.2)" />
-                                <XAxis dataKey="name_ar" interval={0} angle={-45} textAnchor="end" height={70} tick={{ fontSize: 12, fill: '#1f2937' }} />
-                                <YAxis tick={{ fontSize: 12, fill: '#1f2937' }} />
-                                <Tooltip contentStyle={{ backgroundColor: 'rgba(31, 41, 55, 0.8)'}} formatter={(value: number) => [value.toFixed(1), 'معدل الحوادث']} />
-                                <Bar dataKey="accident_rate" fill="#f97316" name="معدل الحوادث" radius={[4, 4, 0, 0]}>
-                                    <LabelList dataKey="accident_rate" position="top" formatter={(value: number) => value.toFixed(1)} style={{ fill: '#1f2937', fontSize: '11px' }} />
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </Card>
-
-                <Card className="card-container">
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{analysisText[9].text}</h2>
-                    <div className="space-y-4 text-lg">
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">4. التوصيات الاستراتيجية والتدخلات المقترحة</h2>
+                    <div className="space-y-6 text-lg">
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{analysisText[10].text}</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">أولاً: الأمن الجنائي ومكافحة المخدرات</h3>
                             <ul className="list-disc list-outside mr-6 space-y-2 mt-2 text-gray-800 dark:text-gray-300">
-                                <li>{analysisText[11].text}</li>
-                                <li>{analysisText[12].text}</li>
+                                <li><strong>استراتيجية الحدود والموانئ:</strong> تعزيز المنظومة الأمنية في العقبة والمفرق بتقنيات مسح متقدمة (X-ray scanners) وزيادة الكوادر الاستخبارية لتفكيك شبكات التهريب قبل وصولها للمجتمع.</li>
+                                <li><strong>الشرطة التنبؤية:</strong> توظيف خوارزميات الذكاء الاصطناعي لتحليل أنماط الجريمة في بؤر التوتر (Hotspots) في العاصمة والزرقاء، وتوجيه الدوريات استباقياً لمنع الجريمة قبل وقوعها.</li>
                             </ul>
                         </div>
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{analysisText[13].text}</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">ثانياً: الأمن المجتمعي والوقاية</h3>
                             <ul className="list-disc list-outside mr-6 space-y-2 mt-2 text-gray-800 dark:text-gray-300">
-                                <li>{analysisText[14].text}</li>
-                                <li>{analysisText[15].text}</li>
+                                <li><strong>تحصين الشباب:</strong> إطلاق برامج توعية غير تقليدية في المدارس والجامعات في المناطق الأكثر تأثراً بالمخدرات، تركز على بناء المهارات الحياتية والحصانة النفسية.</li>
+                                <li><strong>العدالة التصالحية:</strong> التوسع في تطبيق العقوبات البديلة للجرائم البسيطة وغير الخطرة، لتقليل العود للجريمة وتخفيف الضغط على مراكز الإصلاح.</li>
                             </ul>
                         </div>
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{analysisText[16].text}</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">ثالثاً: السلامة المرورية الذكية</h3>
                             <ul className="list-disc list-outside mr-6 space-y-2 mt-2 text-gray-800 dark:text-gray-300">
-                                <li>{analysisText[17].text}</li>
-                                <li>{analysisText[18].text}</li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{analysisText[19].text}</h3>
-                            <ul className="list-disc list-outside mr-6 space-y-2 mt-2 text-gray-800 dark:text-gray-300">
-                                <li>{analysisText[20].text}</li>
+                                <li><strong>هندسة السلامة:</strong> إجراء تدقيق سلامة مرورية (Road Safety Audit) عاجل للنقاط السوداء التي تتكرر فيها حوادث الدهس في إربد والزرقاء، وفصل حركة المشاة عن المركبات.</li>
+                                <li><strong>الرقابة الذكية:</strong> توسيع نطاق الرقابة الآلية (الكاميرات الذكية) لرصد المخالفات الخطرة (السرعة، الهاتف، المسارب) على الطرق الخارجية المؤدية للجنوب والمفرق لردع السلوكيات المتهورة.</li>
                             </ul>
                         </div>
                     </div>

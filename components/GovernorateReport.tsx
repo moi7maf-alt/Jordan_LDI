@@ -144,6 +144,8 @@ const GovernorateReport: React.FC<GovernorateReportProps> = ({ governorate }) =>
 
                 const reportData = {
                     governorateName: governorate.name_ar,
+                    population: populationData?.population,
+                    density: populationData?.density,
                     // Economy
                     unemploymentRate: latestUnemployment.rate,
                     nationalUnemploymentRate: NATIONAL_AVERAGES_2024.unemployment_rate,
@@ -193,16 +195,36 @@ const GovernorateReport: React.FC<GovernorateReportProps> = ({ governorate }) =>
         return text.split('\n').map((line, index) => {
             const trimmed = line.trim();
             if (!trimmed) return null;
+            
+            // Handle Headings (###)
             if (trimmed.startsWith('###')) {
                 return <h3 key={index} className="text-xl font-bold text-gray-900 mt-6 mb-3 break-after-avoid">{trimmed.replace(/###\s?/, '').replace(/\*\*/g, '')}</h3>;
             }
-            if (trimmed.startsWith('**') && trimmed.endsWith('**')) {
+            
+            // Handle Subheadings completely bolded lines (**Title**)
+            if (trimmed.startsWith('**') && trimmed.endsWith('**') && trimmed.length < 120) {
                  return <h4 key={index} className="text-lg font-semibold text-gray-800 mt-4 mb-2 break-after-avoid">{trimmed.replace(/\*\*/g, '')}</h4>;
             }
+            
+            // Handle List Items (* Item)
             if (trimmed.startsWith('* ')) {
-                 return <li key={index} className="list-disc list-inside text-gray-700 mb-1 break-inside-avoid">{trimmed.substring(2).replace(/\*\*/g, '')}</li>;
+                 // Replace inline bolding
+                 const content = trimmed.substring(2).split(/(\*\*.*?\*\*)/g).map((part, i) => 
+                    part.startsWith('**') && part.endsWith('**') 
+                        ? <strong key={i}>{part.slice(2, -2)}</strong> 
+                        : part
+                 );
+                 return <li key={index} className="list-disc list-inside text-gray-700 mb-1 break-inside-avoid">{content}</li>;
             }
-            return <p key={index} className="text-gray-700 mb-2 leading-relaxed break-inside-avoid">{trimmed.replace(/\*\*/g, '')}</p>;
+
+            // Handle Paragraphs with inline bolding
+            const content = trimmed.split(/(\*\*.*?\*\*)/g).map((part, i) => 
+                part.startsWith('**') && part.endsWith('**') 
+                    ? <strong key={i} className="font-bold text-gray-900">{part.slice(2, -2)}</strong> 
+                    : part
+            );
+            
+            return <p key={index} className="text-gray-700 mb-2 leading-relaxed break-inside-avoid text-justify">{content}</p>;
         }).filter(Boolean);
     };
 
@@ -235,7 +257,7 @@ const GovernorateReport: React.FC<GovernorateReportProps> = ({ governorate }) =>
             if (trimmedLine.startsWith('* ')) {
                 return new Paragraph({ text: trimmedLine.substring(2).replace(/\*\*/g, ''), bullet: { level: 0 }, style: "Normal", bidirectional: true, alignment: AlignmentType.RIGHT });
             }
-            return new Paragraph({ text: trimmedLine, style: "Normal", bidirectional: true, alignment: AlignmentType.RIGHT });
+            return new Paragraph({ text: trimmedLine.replace(/\*\*/g, ''), style: "Normal", bidirectional: true, alignment: AlignmentType.RIGHT });
         });
         
         const titlePara = new Paragraph({ text: reportTitle, style: 'h1', bidirectional: true, alignment: AlignmentType.CENTER });
@@ -258,33 +280,21 @@ const GovernorateReport: React.FC<GovernorateReportProps> = ({ governorate }) =>
         }
     };
     
-    /**
-     * Native Print Solution (Iframe Isolation with CSS Paging Injection and Design Stripping)
-     * 
-     * This method creates a clean, document-oriented print view by:
-     * 1. Removing all shadows, backgrounds, and complex UI styling.
-     * 2. Forcing a 'display: block' flow layout to prevent cutting.
-     * 3. Injecting strict paging rules to avoid breaks inside paragraphs.
-     * 4. HIDING the graphical charts section to avoid rendering issues.
-     * 5. Resizing icons to be small (20px) for a clean list view.
-     */
     const handleNativePrint = () => {
         const reportElement = document.getElementById('report-content');
         
         if (!reportElement) return;
 
-        // 1. Create a virtual window
         const printWindow = window.open('', '', 'height=800,width=1000');
         if (!printWindow) return;
 
-        // 2. Prepare head with strict CSS for paging and design stripping
+        // Strict CSS to hide ALL visual elements (charts, KPIs, icons) and keep only text
         const headContent = `
             <head>
                 <title>تقرير ${governorate.name_ar} - ${new Date().toLocaleDateString('ar-JO')}</title>
                 <style>
                     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
                     
-                    /* RESET & BASICS */
                     body {
                         font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                         direction: rtl;
@@ -296,54 +306,26 @@ const GovernorateReport: React.FC<GovernorateReportProps> = ({ governorate }) =>
                         font-size: 12pt;
                     }
 
-                    /* DESIGN STRIPPING */
-                    * {
-                        box-shadow: none !important;
-                        text-shadow: none !important;
-                        background-color: transparent !important;
-                        border-radius: 0 !important;
-                        border: none !important;
-                    }
-                    
-                    /* Hide elements marked as no-print (The Charts) */
-                    .no-print {
-                        display: none !important;
+                    /* CRITICAL: Hide all visual/KPI sections */
+                    .kpi-section, 
+                    .kpi-card-visual, 
+                    .icon-wrapper, 
+                    .icon-container, 
+                    svg, 
+                    .no-print,
+                    .card-container { 
+                        display: none !important; 
                     }
 
-                    /* LAYOUT FLATTENING */
-                    .grid, .flex, .flex-row, .flex-col {
-                        display: block !important; /* Force flow layout */
-                    }
-                    
-                    /* KPI Cards styling for print */
-                    .card-container {
-                         padding: 10px 0 !important;
-                         border-bottom: 1px solid #eee !important;
-                         margin-bottom: 10px !important;
-                    }
-                    
-                    /* Ensure flexible content within cards is handled */
-                    .card-container .flex {
-                        display: flex !important;
-                        align-items: center !important;
-                        justify-content: space-between !important;
-                    }
-                    
-                    /* RESET ICON CONTAINERS */
-                    .icon-wrapper, .rounded-full {
-                        width: auto !important;
-                        height: auto !important;
-                        padding: 0 10px !important;
-                        margin: 0 !important;
-                        background: none !important;
-                        display: inline-block !important;
-                        min-width: 20px !important;
-                        border: none !important;
+                    /* Allow specific text content to show */
+                    #ai-report-text-container, 
+                    #ai-report-text-container * {
+                        display: block !important;
                     }
 
-                    /* TYPOGRAPHY */
+                    /* Typography for Document Feel */
                     h1 {
-                        font-size: 22pt !important;
+                        font-size: 24pt !important;
                         font-weight: bold !important;
                         text-align: center !important;
                         border-bottom: 2px solid #000 !important;
@@ -367,7 +349,7 @@ const GovernorateReport: React.FC<GovernorateReportProps> = ({ governorate }) =>
                         font-size: 16pt !important;
                         font-weight: bold !important;
                         color: #333 !important;
-                        margin-top: 20px !important;
+                        margin-top: 25px !important;
                         break-after: avoid !important;
                     }
                     
@@ -375,48 +357,42 @@ const GovernorateReport: React.FC<GovernorateReportProps> = ({ governorate }) =>
                          font-size: 14pt !important;
                          font-weight: bold !important;
                          margin-top: 15px !important;
+                         color: #444 !important;
                     }
 
                     p, li {
-                        font-size: 12pt !important;
-                        line-height: 1.6 !important;
+                        font-size: 13pt !important;
+                        line-height: 1.8 !important;
                         text-align: justify !important;
-                        margin-bottom: 10px !important;
+                        margin-bottom: 15px !important;
                         color: #000 !important;
                         page-break-inside: avoid !important;
                     }
                     
-                    /* KPI Values */
-                    .kpi-value { font-size: 16pt !important; font-weight: bold !important; margin: 0 !important; }
-                    .kpi-title { font-size: 10pt !important; color: #555 !important; }
-
-                     /* ICONS SIZING - Small for text-based report */
-                    svg {
-                        width: 20px !important;
-                        height: 20px !important;
-                        display: inline-block !important;
-                        vertical-align: middle !important;
+                    strong {
+                        font-weight: 700;
+                        color: #000;
                     }
 
                     .report-header {
                         text-align: center;
                         border-bottom: 2px solid #333;
-                        margin-bottom: 30px;
+                        margin-bottom: 40px;
                         padding-bottom: 20px;
                     }
                     
                     .report-footer {
                         margin-top: 50px;
                         text-align: center;
-                        font-size: 12px;
+                        font-size: 10pt;
                         color: #666;
                         border-top: 1px solid #eee;
-                        padding-top: 10px;
+                        padding-top: 15px;
                     }
                     
                     @page {
                         size: A4;
-                        margin: 15mm 20mm;
+                        margin: 20mm 25mm;
                     }
                 </style>
             </head>
@@ -429,14 +405,17 @@ const GovernorateReport: React.FC<GovernorateReportProps> = ({ governorate }) =>
                 ${headContent}
                 <body>
                     <div class="report-header">
-                        <h1>تقرير التنمية المستدامة: محافظة ${governorate.name_ar}</h1>
-                        <p style="text-align: center !important;">تاريخ التقرير: ${date} | المصدر: نظام التخطيط الذكي</p>
+                        <h1>التقرير الاستراتيجي للتنمية المستدامة: محافظة ${governorate.name_ar}</h1>
+                        <p style="text-align: center !important; font-size: 12pt;">وثيقة سياسات | تاريخ الإصدار: ${date}</p>
                     </div>
-                    <div class="content">
-                        ${reportElement.innerHTML}
+                    
+                    <!-- Main Narrative Content -->
+                    <div id="main-content">
+                        ${reportElement.querySelector('#ai-report-text-container')?.innerHTML || ''}
                     </div>
+
                     <div class="report-footer">
-                        تم توليد هذا التقرير آلياً بواسطة منظومة التحليل التنموي - وزارة الداخلية.
+                        وزارة الداخلية - مديرية التنمية المحلية | منظومة التحليل الرقمي
                     </div>
                 </body>
             </html>
@@ -496,7 +475,9 @@ const GovernorateReport: React.FC<GovernorateReportProps> = ({ governorate }) =>
                 </button>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 pt-4 text-center break-after-avoid">{reportTitle}</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 break-inside-avoid">
+            
+            {/* Wrap visual KPIs in a specific class to hide them easily during print */}
+            <div className="kpi-section grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 break-inside-avoid">
                 <KPICard title="عدد السكان (2024)" value={governorateMetrics?.population || 'N/A'} icon={<PopulationIcon />} color="bg-amber-500" />
                 <KPICard title="الكثافة (نسمة/كم²)" value={governorateMetrics?.density || 'N/A'} icon={<DensityIcon />} color="bg-amber-500" />
                 <KPICard title="معدل البطالة (2024)" value={governorateMetrics?.unemployment || 'N/A'} icon={<UnemploymentIcon />} color="bg-amber-500" />

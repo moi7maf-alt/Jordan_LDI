@@ -25,10 +25,31 @@ const Water: React.FC = () => {
         }));
     }, []);
 
+    const reportContent = [
+        {
+            title: "1. الأمن المائي: الواقع الاستراتيجي والتحديات الهيكلية",
+            content: `يواجه الأردن أزمة مائية وجودية تتجاوز مفهوم "الشح" لتصل إلى العجز الهيكلي المزمن. تشير البيانات الرقمية لعام 2024 إلى انخفاض حصة الفرد من المياه في العديد من المحافظات عن خط الفقر المائي المدقع (أقل من 100 متر مكعب سنوياً). في محافظة إربد، انخفضت حصة الفرد إلى 77.6 م³ سنوياً، وفي جرش إلى 84.3 م³، مما يضع هذه المحافظات تحت ضغط ديموغرافي ومائي هائل، فاقمه اللجوء السوري والتغير المناخي الذي أدى لتراجع الهطول المطري بنسبة تتجاوز 20% عن المعدل العام طويل الأمد.
+            
+            هذا العجز دفع الدولة والمواطن نحو حلول مكلفة وغير مستدامة. الاعتماد على المياه الجوفية تجاوز الحدود الآمنة للسحب (Safe Yield) بأضعاف في أحواض رئيسية كالأزرق واليرموك، مما ينذر بملوحة المياه ونضوب الطبقات الجوفية الاستراتيجية.`
+        },
+        {
+            title: "2. اقتصاد الصهاريج: الخصخصة القسرية للمياه",
+            content: `يكشف تحليل مصادر مياه الشرب عن تحول خطير في نمط التزود بالمياه، حيث باتت "الصهاريج" المصدر الرئيسي للمياه في محافظات حيوية، متجاوزة الشبكة العامة. في جرش، يعتمد 73.8% من الأسر على الصهاريج، وفي مأدبا 71.8%، وفي الكرك 71.3%. هذا الاعتماد المرتفع يشير إلى فشل في كفاءة الشبكة العامة وعدم انتظام أدوار المياه.
+            
+            هذا التحول خلق ما يمكن تسميته "اقتصاد الصهاريج"، حيث تتحمل الأسر كلفة إضافية باهظة للحصول على المياه (سعر المتر المكعب من الصهريج قد يصل لـ 5 أضعاف سعره من الشبكة)، مما يفاقم الفجوة الاجتماعية ويستنزف دخل الأسر، خاصة في المحافظات ذات الدخل المحدود.`
+        },
+        {
+            title: "3. تحدي الصرف الصحي والبعد البيئي",
+            content: `تظهر البيانات تبايناً صارخاً في خدمات الصرف الصحي يعكس غياب العدالة في توزيع مشاريع البنية التحتية. بينما تتمتع العقبة بنسبة تغطية شبكة عامة تصل إلى 87.4% والزرقاء 82.8%، تعاني محافظات ذات طبيعة جيولوجية حساسة من غياب شبه كامل للشبكة. في الكرك، تعتمد 83.6% من الأسر على الحفر الامتصاصية، وفي المفرق 85.0%.
+            
+            هذا الاعتماد الهائل على الحفر الامتصاصية يشكل "قنبلة بيئية موقوتة"، خاصة في المناطق التي تعتمد على المياه الجوفية للشرب والزراعة، حيث يرتفع خطر تلوث الأحواض الجوفية بالنترات والملوثات البيولوجية، مما يهدد الأمن الصحي والغذائي على المدى الطويل.`
+        }
+    ];
+
     const handleExportDocx = async () => {
         setIsExportingDocx(true);
         try {
-            const title = "تقرير قطاع المياه والصرف الصحي 2024";
+            const title = "تقرير الواقع المائي الاستراتيجي 2024";
             
             const docStyles: IStylesOptions = {
                 default: { document: { run: { font: "Arial", size: 24, rightToLeft: true } } },
@@ -41,21 +62,17 @@ const Water: React.FC = () => {
 
             const children = [
                 new Paragraph({ text: title, style: "h1" }),
-                new Paragraph({ text: "نظرة على مصادر المياه، تحديات النقص، والبنية التحتية للصرف الصحي في الأردن.", style: "Normal" }),
+                new Paragraph({ text: "تحليل معمق للفجوة المائية، اقتصاديات التزود، والبنية التحتية للصرف الصحي.", style: "Normal" }),
                 
-                new Paragraph({ text: "1. الأمن المائي", style: "h2" }),
-                new Paragraph({ text: "يُصنف الأردن كواحد من أفقر دول العالم مائياً.", style: "Normal" }),
-                new Paragraph({ text: "تظهر البيانات اعتماداً كبيراً على الصهاريج كمصدر مياه رئيسي للأسر.", style: "Normal" }),
+                ...reportContent.flatMap(section => [
+                    new Paragraph({ text: section.title, style: "h2" }),
+                    new Paragraph({ text: section.content, style: "Normal" })
+                ]),
 
-                new Paragraph({ text: "2. التحديات الرئيسية", style: "h2" }),
-                new Paragraph({ text: "انخفاض إجمالي الموارد المائية بنسبة 15.4% بين عامي 2020 و 2024.", style: "Normal", bullet: { level: 0 } }),
-                new Paragraph({ text: "الاعتماد المفرط على المياه الجوفية غير المتجددة.", style: "Normal", bullet: { level: 0 } }),
-                new Paragraph({ text: "تفاوت كبير في حصة الفرد بين المحافظات، مع ضغط شديد في إربد وجرش.", style: "Normal", bullet: { level: 0 } }),
-
-                new Paragraph({ text: "3. التوصيات الاستراتيجية", style: "h2" }),
-                new Paragraph({ text: "تسريع مشاريع التحلية الكبرى (الناقل الوطني).", style: "Normal", bullet: { level: 0 } }),
-                new Paragraph({ text: "تقنين الاستخدام الزراعي الجائر للمياه الجوفية.", style: "Normal", bullet: { level: 0 } }),
-                new Paragraph({ text: "التوسع في معالجة مياه الصرف الصحي للاستخدام الزراعي.", style: "Normal", bullet: { level: 0 } }),
+                new Paragraph({ text: "4. التوصيات الاستراتيجية لصناع القرار", style: "h2" }),
+                new Paragraph({ text: "أولاً: تسريع تنفيذ مشروع الناقل الوطني كأولوية قصوى لضمان أمن التزود المائي للمراكز السكانية الكبرى (عمان، إربد، الزرقاء).", style: "Normal", bullet: { level: 0 } }),
+                new Paragraph({ text: "ثانياً: إطلاق برنامج وطني لشبكات الصرف الصحي اللامركزية في المناطق الريفية والطرفية (خاصة الكرك والمفرق) لحماية المياه الجوفية.", style: "Normal", bullet: { level: 0 } }),
+                new Paragraph({ text: "ثالثاً: مراجعة تعرفة المياه تصاعدياً لقطاعات الاستخدام الترفيهي والتجاري لتمويل صيانة الشبكات وتقليل الفاقد (NRW) الذي يتجاوز 45% في بعض المناطق.", style: "Normal", bullet: { level: 0 } }),
             ];
 
             const doc = new Document({
@@ -83,36 +100,32 @@ const Water: React.FC = () => {
             <head>
                 <title>تقرير قطاع المياه - 2024</title>
                 <style>
-                    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+                    @import url('https://fonts.googleapis.com/css2?family=Traditional+Arabic:wght@400;700&display=swap');
                     body {
-                        font-family: 'Cairo', sans-serif;
+                        font-family: 'Traditional Arabic', serif;
                         direction: rtl;
                         padding: 40px;
                         background: white !important;
                         color: black !important;
-                        font-size: 14pt;
+                        font-size: 16pt;
+                        line-height: 1.6;
                     }
-                    * {
-                        box-shadow: none !important;
-                        background: transparent !important;
-                        border-radius: 0 !important;
-                        border: none !important;
-                    }
-                    .grid, .flex { display: block !important; }
-                    .no-print, .recharts-wrapper, button, select { display: none !important; }
+                    .no-print, .recharts-wrapper, button, select, svg, .icon-container, .kpi-card-visual { display: none !important; }
                     
                     .card-container {
+                        box-shadow: none !important;
+                        border: none !important;
                         padding: 0 !important;
-                        margin: 0 0 20px 0 !important;
-                        border-bottom: 1px solid #eee !important;
+                        margin-bottom: 20px !important;
+                        break-inside: avoid;
                     }
                     
-                    h1 { font-size: 26pt !important; text-align: center; border-bottom: 2px solid black; margin-bottom: 20px; }
-                    h2 { font-size: 20pt !important; border-bottom: 1px solid #ccc; margin-top: 30px; break-after: avoid; }
-                    h3 { font-size: 18pt !important; color: #333; margin-top: 20px; break-after: avoid; }
-                    p, li { font-size: 14pt !important; line-height: 1.6; text-align: justify; }
+                    h1 { font-size: 28pt; font-weight: bold; text-align: center; border-bottom: 3px solid #000; margin-bottom: 30px; padding-bottom: 10px; }
+                    h2 { font-size: 22pt; font-weight: bold; border-bottom: 1px solid #666; margin-top: 30px; margin-bottom: 15px; }
+                    h3 { font-size: 18pt; font-weight: bold; margin-top: 20px; }
+                    p, li { text-align: justify; margin-bottom: 12px; }
                     
-                    @page { size: A4; margin: 20mm; }
+                    @page { size: A4; margin: 2.5cm; }
                 </style>
             </head>
         `;
@@ -122,13 +135,13 @@ const Water: React.FC = () => {
                 ${headContent}
                 <body>
                     <div class="report-header">
-                        <h1>تقرير تحليلي: قطاع المياه والصرف الصحي</h1>
+                        <h1>التقرير الاستراتيجي: قطاع المياه والصرف الصحي</h1>
                     </div>
                     <div class="content">
                         ${reportElement.innerHTML}
                     </div>
-                     <div class="report-footer" style="text-align: center; margin-top: 50px; font-size: 10pt; color: #666;">
-                        وزارة الداخلية - منظومة التحليل التنموي
+                     <div class="report-footer" style="text-align: center; margin-top: 50px; font-size: 12pt; color: #666; border-top: 1px solid #ccc; padding-top: 10px;">
+                        وزارة الداخلية - مديرية التنمية المحلية | منظومة التحليل الرقمي
                     </div>
                 </body>
             </html>
@@ -153,31 +166,38 @@ const Water: React.FC = () => {
                     disabled={isExportingDocx}
                     className="px-4 py-2 text-sm font-medium text-black bg-amber-500 rounded-lg hover:bg-amber-600 focus:ring-4 focus:outline-none focus:ring-amber-300 disabled:bg-gray-400 flex items-center gap-2"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                    {isExportingDocx ? 'جاري التصدير...' : 'تصدير (DOCX)'}
+                    تصدير (DOCX)
                 </button>
                 <button onClick={handleNativePrint} className="px-4 py-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-amber-600 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-                    طباعة / حفظ PDF (وثيقة نظيفة)
+                    طباعة (تقرير نصي)
                 </button>
             </div>
             <div id="report-content" className="space-y-8">
                 <header className="text-center border-b border-gray-200 dark:border-gray-700 pb-8 no-print">
                     <h1 className="text-3xl font-bold text-gray-900">تحليلات قطاع المياه والصرف الصحي</h1>
-                    <p className="text-lg text-gray-700 mt-1">نظرة على مصادر المياه، تحديات النقص، والبنية التحتية للصرف الصحي في الأردن.</p>
+                    <p className="text-lg text-gray-700 mt-1">تحليل استراتيجي للواقع المائي وتحديات البنية التحتية (2024)</p>
                 </header>
 
-                <Card>
-                    <h2 className="text-xl font-bold text-gray-900 mb-2">الأمن المائي: التحدي الأكبر</h2>
-                    <p className="text-gray-700 leading-relaxed">
-                        يُصنف الأردن كواحد من أفقر دول العالم مائياً، مما يجعل إدارة الموارد المائية تحدياً استراتيجياً بالغ الأهمية. تظهر البيانات اعتماداً كبيراً على الصهاريج كمصدر مياه رئيسي للأسر، مما يعكس الضغط على الشبكة العامة. كما أن تغطية شبكة الصرف الصحي لا تزال دون المستوى المأمول في العديد من المحافظات، مما يزيد من الأعباء البيئية والصحية. لقد فاقمت أزمة اللجوء السوري من حدة هذا التحدي، بالإضافة إلى التأثيرات المتزايدة للتغير المناخي.
-                    </p>
+                {reportContent.map((section, idx) => (
+                    <Card key={idx} className="card-container">
+                        <h2 className="text-xl font-bold text-gray-900 mb-3">{section.title}</h2>
+                        <div className="text-gray-700 leading-relaxed text-lg whitespace-pre-line">
+                            {section.content}
+                        </div>
+                    </Card>
+                ))}
+
+                <Card className="card-container">
+                    <h2 className="text-xl font-bold text-gray-900 mb-4">4. الخلاصة والتوصيات العاجلة</h2>
+                    <div className="space-y-4 text-gray-800 text-lg">
+                        <p><strong>إدارة الأزمة:</strong> الوضع المائي في الأردن لا يحتمل التأجيل. الاعتماد على الحلول المؤقتة (الصهاريج) يرهق المواطن والدولة. يجب التحول الفوري نحو إدارة الطلب بصرامة، ورفع كفاءة الشبكات لتقليل الفاقد الذي يصل لمستويات حرجة.</p>
+                        <p><strong>الاستدامة البيئية:</strong> التوسع في شبكات الصرف الصحي في المناطق الريفية ليس ترفاً بل ضرورة لحماية ما تبقى من مياه جوفية صالحة للشرب.</p>
+                        <p><strong>الناقل الوطني:</strong> تسريع تنفيذ مشروع الناقل الوطني كأولوية قصوى لضمان أمن التزود المائي للمراكز السكانية الكبرى (عمان، إربد، الزرقاء).</p>
+                    </div>
                 </Card>
 
-                <Card>
-                    <div className="flex justify-between items-center mb-4 no-print">
+                <Card className="no-print">
+                    <div className="flex justify-between items-center mb-4">
                         <h3 className="text-lg font-semibold text-gray-800">حصّة الفرد من المياه (م³/سنوياً)</h3>
                         <select
                             value={selectedGov}
@@ -187,13 +207,12 @@ const Water: React.FC = () => {
                             {governorateData.map(g => <option key={g.name} value={g.name}>{g.name_ar}</option>)}
                         </select>
                     </div>
-                    {selectedGovTrendData && <div className="no-print"><WaterTrendChart data={selectedGovTrendData} /></div>}
-                    <p className="text-gray-700 mt-2">تظهر الرسوم البيانية (غير ظاهرة في الطباعة) تذبذب حصة الفرد من المياه، مما يعكس الضغط المتزايد على الموارد.</p>
+                    {selectedGovTrendData && <WaterTrendChart data={selectedGovTrendData} />}
                 </Card>
 
-                <Card>
+                <Card className="no-print">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">مصدر مياه الشرب الرئيسي للأسر (%)</h3>
-                    <div style={{ width: '100%', height: 400 }} className="no-print">
+                    <div style={{ width: '100%', height: 400 }}>
                         <ResponsiveContainer>
                             <BarChart data={WATER_SOURCES_DATA.filter(d => d.name !== 'Kingdom')} layout="vertical" margin={{ left: 20 }}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(128,128,128,0.2)" />
@@ -209,58 +228,6 @@ const Water: React.FC = () => {
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
-                </Card>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 no-print">
-                    <Card>
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">طريقة التعامل مع نقص المياه (%)</h3>
-                        <div style={{ width: '100%', height: 300 }}>
-                            <ResponsiveContainer>
-                                <BarChart data={WATER_SHORTAGE_DATA.filter(d => d.name !== 'Kingdom')} layout="vertical" margin={{ left: 20 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(128,128,128,0.2)" />
-                                    <XAxis type="number" unit="%" tick={{ fontSize: 12, fill: '#333333' }} />
-                                    <YAxis type="category" dataKey="name_ar" width={80} tick={{ fontSize: 12, fill: '#333333' }} />
-                                    <Tooltip formatter={(value: number) => `${value.toFixed(1)}%`} contentStyle={{ backgroundColor: 'rgba(31, 41, 55, 0.8)' }} />
-                                    <Legend />
-                                    <Bar dataKey="no_shortage" name="لا يوجد نقص" stackId="a" fill="#10b981" />
-                                    <Bar dataKey="buy_tankers" name="شراء صهاريج" stackId="a" fill="#f59e0b" />
-                                    <Bar dataKey="other" name="أخرى" stackId="a" fill="#64748b" />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </Card>
-                    <Card>
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">طريقة التخلص من المياه العادمة (%)</h3>
-                        <div style={{ width: '100%', height: 300 }}>
-                            <ResponsiveContainer>
-                                <BarChart data={SANITATION_DATA.filter(d => d.name !== 'Kingdom')} layout="vertical" margin={{ left: 20 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(128,128,128,0.2)" />
-                                    <XAxis type="number" unit="%" tick={{ fontSize: 12, fill: '#333333' }} />
-                                    <YAxis type="category" dataKey="name_ar" width={80} tick={{ fontSize: 12, fill: '#333333' }} />
-                                    <Tooltip formatter={(value: number) => `${value.toFixed(1)}%`} contentStyle={{ backgroundColor: 'rgba(31, 41, 55, 0.8)' }} />
-                                    <Legend />
-                                    <Bar dataKey="public_network" name="شبكة عامة" stackId="a" fill="#8b5cf6" />
-                                    <Bar dataKey="cesspit" name="حفرة امتصاصية" stackId="a" fill="#db2777" />
-                                    <Bar dataKey="no_sanitation" name="لا يوجد" stackId="a" fill="#78716c" />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </Card>
-                </div>
-                
-                <Card className="card-container">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">الخلاصة والتحديات</h2>
-                    <ul className="list-disc list-outside mr-6 space-y-2 text-gray-700 text-lg">
-                        <li><strong>تراجع حاد:</strong> انخفاض إجمالي الموارد المائية بنسبة 15.4% بين عامي 2020 و 2024.</li>
-                        <li><strong>استنزاف الجوفي:</strong> الاعتماد المفرط على المياه الجوفية غير المتجددة.</li>
-                        <li><strong>أزمة توزيع:</strong> تفاوت كبير في حصة الفرد بين المحافظات، مع ضغط شديد في إربد وجرش.</li>
-                    </ul>
-                    <h2 className="text-2xl font-bold text-gray-900 mt-6 mb-4">التوصيات الاستراتيجية</h2>
-                    <ul className="list-disc list-outside mr-6 space-y-2 text-gray-700 text-lg">
-                        <li><strong>التحول نحو الاستدامة:</strong> تسريع مشاريع التحلية الكبرى (الناقل الوطني).</li>
-                        <li><strong>إدارة الطلب:</strong> تقنين الاستخدام الزراعي الجائر للمياه الجوفية.</li>
-                        <li><strong>المياه غير التقليدية:</strong> التوسع في معالجة مياه الصرف الصحي للاستخدام الزراعي والصناعي.</li>
-                    </ul>
                 </Card>
             </div>
         </div>

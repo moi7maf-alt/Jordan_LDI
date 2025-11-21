@@ -85,10 +85,9 @@ const FinalRankingDisplay: React.FC<{ rankData: FinalRanking2024[], scoreData: D
     const rankIcons: { [key: number]: string } = { 1: '🥇', 2: '🥈', 3: '🥉' };
 
     const getBarColor = (rank: number) => {
-        if (rank === 1) return 'bg-yellow-400 dark:bg-yellow-500';
-        if (rank === 2) return 'bg-gray-400 dark:bg-gray-500';
-        if (rank === 3) return 'bg-orange-400 dark:bg-orange-500';
-        return 'bg-amber-500 dark:bg-amber-600';
+        if (rank <= 4) return 'bg-emerald-500'; // Tier 1
+        if (rank <= 8) return 'bg-amber-500';   // Tier 2
+        return 'bg-red-500';                    // Tier 3
     };
 
     return (
@@ -120,6 +119,104 @@ const FinalRankingDisplay: React.FC<{ rankData: FinalRanking2024[], scoreData: D
     );
 };
 
+const RecommendationsSection = () => (
+    <div className="mt-16 border-t border-gray-200 dark:border-gray-700 pt-10">
+        <div className="text-center mb-12">
+            <h3 className="text-3xl font-extrabold text-gray-900 dark:text-white">خارطة طريق 2025: توصيات استراتيجية لكل محافظة</h3>
+            <p className="text-xl text-gray-600 dark:text-gray-300 mt-3 max-w-4xl mx-auto">
+                بناءً على نتائج المؤشر، نقدم حزمة تدخلات نوعية وموجهة جغرافياً، لضمان وصول ثمار التنمية لكل مواطن في كافة المحافظات.
+            </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+            {/* Leading Governorates */}
+            <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-14 h-14 bg-emerald-100 dark:bg-emerald-800 rounded-full flex items-center justify-center mb-6 text-3xl">🚀</div>
+                <h4 className="text-2xl font-bold text-emerald-800 dark:text-emerald-300 mb-4">محافظات الريادة</h4>
+                <ul className="space-y-4 text-lg font-medium text-gray-700 dark:text-gray-300 leading-relaxed">
+                    <li className="flex items-start gap-3">
+                        <span className="text-emerald-500 font-bold text-xl">•</span>
+                        <span><strong>عمان:</strong> ترسيخ مكانتها كمركز إقليمي للأعمال والابتكار والرقمنة.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                        <span className="text-emerald-500 font-bold text-xl">•</span>
+                        <span><strong>العقبة:</strong> التوسع في الخدمات اللوجستية العالمية والموانئ الخضراء.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                        <span className="text-emerald-500 font-bold text-xl">•</span>
+                        <span><strong>الزرقاء:</strong> التحول نحو "الصناعة النظيفة" وتأهيل المناطق الصناعية بيئياً.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                        <span className="text-emerald-500 font-bold text-xl">•</span>
+                        <span><strong>البلقاء:</strong> تطوير السياحة العلاجية وربطها بالمنتجات الزراعية المحلية.</span>
+                    </li>
+                </ul>
+            </div>
+
+            {/* Growth Governorates */}
+            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-14 h-14 bg-amber-100 dark:bg-amber-800 rounded-full flex items-center justify-center mb-6 text-3xl">⚡</div>
+                <h4 className="text-2xl font-bold text-amber-800 dark:text-amber-300 mb-4">محافظات النمو</h4>
+                <ul className="space-y-4 text-lg font-medium text-gray-700 dark:text-gray-300 leading-relaxed">
+                    <li className="flex items-start gap-3">
+                        <span className="text-amber-500 font-bold text-xl">•</span>
+                        <span><strong>إربد:</strong> تعزيزها كمركز وطني لتكنولوجيا المعلومات والريادة الرقمية (IT Hub).</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                        <span className="text-amber-500 font-bold text-xl">•</span>
+                        <span><strong>الكرك:</strong> تعظيم القيمة المضافة للصناعات التعدينية (الفوسفات والبوتاس).</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                        <span className="text-amber-500 font-bold text-xl">•</span>
+                        <span><strong>جرش:</strong> دمج السياحة الأثرية بسياحة الطعام والمهرجانات الثقافية.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                        <span className="text-amber-500 font-bold text-xl">•</span>
+                        <span><strong>مأدبا:</strong> تطوير مسارات سياحة المغامرات والسياحة الدينية.</span>
+                    </li>
+                </ul>
+            </div>
+
+            {/* Priority Governorates */}
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-14 h-14 bg-red-100 dark:bg-red-800 rounded-full flex items-center justify-center mb-6 text-3xl">🏗️</div>
+                <h4 className="text-2xl font-bold text-red-800 dark:text-red-300 mb-4">محافظات الأولوية</h4>
+                <ul className="space-y-4 text-lg font-medium text-gray-700 dark:text-gray-300 leading-relaxed">
+                    <li className="flex items-start gap-3">
+                        <span className="text-red-500 font-bold text-xl">•</span>
+                        <span><strong>المفرق:</strong> تحفيز الاستثمار في اللوجستيات الحدودية والطاقة الشمسية.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                        <span className="text-red-500 font-bold text-xl">•</span>
+                        <span><strong>معان:</strong> التوسع في مشاريع الطاقة المتجددة والزراعة الصحراوية الذكية.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                        <span className="text-red-500 font-bold text-xl">•</span>
+                        <span><strong>عجلون:</strong> دعم هوية "السياحة البيئية" والتلفريك ومشاريع الزراعة العضوية.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                        <span className="text-red-500 font-bold text-xl">•</span>
+                        <span><strong>الطفيلة:</strong> إطلاق حزمة مشاريع بنية تحتية وسياحية لتشغيل الشباب.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        {/* Comprehensive Recommendation */}
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-800 border border-blue-200 dark:border-slate-600 rounded-xl p-10 shadow-md">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
+                <div className="w-20 h-20 bg-white dark:bg-slate-700 rounded-full flex items-center justify-center text-4xl shadow-sm flex-shrink-0">📊</div>
+                <div>
+                    <h4 className="text-2xl font-bold text-blue-900 dark:text-blue-300 mb-3">توصية شاملة: الحوكمة القائمة على البيانات</h4>
+                    <p className="text-gray-800 dark:text-gray-200 text-xl leading-relaxed font-medium">
+                        إنشاء <strong>"منصة بيانات تنموية وطنية موحدة"</strong> تتيح لصناع القرار متابعة أداء المؤشرات في كافة المحافظات بشكل فوري، وربط موازنات "مجالس المحافظات" (اللامركزية) بمدى تحقيق مستهدفات رقمية واضحة في هذه المؤشرات، لضمان تحويل التخطيط إلى نتائج ملموسة على الأرض.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+);
+
 
 // Expanded analysis text generation
 const getAnalysisText = (indicatorKey: string, data: any[]) => {
@@ -142,27 +239,41 @@ const getAnalysisText = (indicatorKey: string, data: any[]) => {
 
     switch (indicatorKey) {
         case 'final_ranking':
-            const middle6 = sortedData.slice(3, 9);
-            const formatMiddleList = middle6.map(g => formatGovernorate(g)).join('، ');
+            // Categorize into 3 groups of 4
+            const tier1 = sortedData.slice(0, 4);
+            const tier2 = sortedData.slice(4, 8);
+            const tier3 = sortedData.slice(8, 12);
+
+            const formatList = (list: any[]) => list.map(g => `<strong>${g.name_ar}</strong>`).join('، ');
 
             return `
-                <p class="mb-4">يعكس الترتيب النهائي لمؤشر التنمية المحلية المستدامة الأداء الكلي للمحافظات عبر المحاور الخمسة الرئيسية، مقدماً رؤية شاملة لمستوى التطور في كل منها.</p>
-                <h4 class="font-semibold text-gray-800 dark:text-white mb-2">الفئة الأولى: المحافظات الرائدة</h4>
-                <p class="mb-4">تتصدر ${formatGovernorate(top3[0])} المشهد بفارق ملحوظ، مستفيدة من مكانتها كمركز اقتصادي وإداري للمملكة. تليها ${formatGovernorate(top3[1])} التي تتميز ببنيتها التحتية القوية وقطاعها السياحي الواعد، ثم ${formatGovernorate(top3[2])} التي تظهر أداءً متوازناً في مختلف القطاعات.</p>
+                <p class="mb-6 text-lg">بناءً على نتائج مؤشر التنمية المحلية المستدامة لعام 2024، تم تصنيف محافظات المملكة إلى ثلاث فئات رئيسية، تضم كل منها 4 محافظات تتشابه في مستويات الأداء التنموي والتحديات الهيكلية:</p>
                 
-                <h4 class="font-semibold text-gray-800 dark:text-white mb-2">الفئة الثانية: محافظات النمو الواعدة</h4>
-                <p class="mb-4">تضم هذه الفئة محافظات تمتلك إمكانيات كبيرة للتقدم ولكنها تواجه تحديات محددة في بعض القطاعات. وتشمل بالترتيب: ${formatMiddleList}. هذه المحافظات، مثل <strong>جرش</strong> بقطاعها التعليمي الجيد و<strong>الكرك</strong> بوضعها الصحي المتقدم، يمكنها تحقيق قفزات نوعية من خلال معالجة نقاط ضعف معينة كالبنية التحتية أو تنويع النشاط الاقتصادي.</p>
+                <div class="space-y-6">
+                    <div class="bg-emerald-50 p-4 rounded-lg border border-emerald-100">
+                        <h4 class="font-bold text-emerald-800 text-lg mb-2">🟢 الفئة الأولى: محافظات "الريادة التنموية"</h4>
+                        <p class="text-emerald-900 mb-2">تشمل: ${formatList(tier1)}</p>
+                        <p class="text-sm text-emerald-800 leading-relaxed">
+                            تتميز هذه المحافظات بتسجيل أعلى الدرجات في المؤشر العام. خصائصها المشتركة تشمل بنية تحتية متطورة، نشاطاً اقتصادياً مرتفعاً، وتركزاً للخدمات الحكومية والخاصة. <strong>عمان</strong> تقود كمركز للعاصمة، بينما تستفيد <strong>العقبة</strong> من وضعها الاقتصادي الخاص، و<strong>الزرقاء</strong> من قاعدتها الصناعية. التحدي هنا هو "إدارة النمو" والاستدامة البيئية.
+                        </p>
+                    </div>
 
-                <h4 class="font-semibold text-gray-800 dark:text-white mb-2">الفئة الثالثة: محافظات تتطلب دعماً مكثفاً</h4>
-                <p class="mb-4">تُظهر النتائج أن هناك حاجة لتركيز الجهود التنموية في المحافظات التي تقع في مراتب متأخرة مثل ${formatGovernorate(bottom3[0])}, ${formatGovernorate(bottom3[1])}, و ${formatGovernorate(bottom3[2])}. تعاني هذه المحافظات من تحديات مركّبة تتطلب خططاً تنموية متكاملة ومخصصة.</p>
-                
-                <h4 class="font-semibold text-gray-800 dark:text-white mb-2">توصيات استراتيجية قابلة للتنفيذ</h4>
-                <ul class="list-disc list-outside mr-6 space-y-2 my-4">
-                    <li><strong>للمحافظات الرائدة:</strong> التركيز على التحول نحو اقتصاد المعرفة والخدمات المتقدمة، وتعزيز مكانتها كمراكز إقليمية للابتكار وريادة الأعمال. إطلاق "صناديق استثمار تنموية" متخصصة بكل محافظة.</li>
-                    <li><strong>لمحافظات النمو:</strong> تنفيذ "برامج تسريع تنموي" تستهدف القطاعات ذات الأولوية في كل محافظة. على سبيل المثال، دعم السياحة البيئية والمغامرات في <strong>عجلون والطفيلة</strong>، وتطوير الصناعات الزراعية التحويلية في <strong>جرش</strong>.</li>
-                    <li><strong>للمحافظات الأقل حظاً:</strong> إطلاق "حزمة مشاريع بنية تحتية أساسية" تشمل تطوير شبكات المياه والصرف الصحي والطرق الثانوية. تقديم حوافز ضريبية واستثمارية استثنائية لجذب المشاريع كثيفة العمالة إلى <strong>المفرق ومعان</strong>.</li>
-                    <li><strong>توصية شاملة:</strong> إنشاء "منصة بيانات تنموية موحدة" تتيح لصناع القرار متابعة أداء المؤشرات بشكل دوري وتوجيه الموارد بفعالية أكبر بناءً على البيانات المحدثة، وربط موازنات المحافظات (اللامركزية) بتحقيق مستهدفات واضحة في هذه المؤشرات.</li>
-                </ul>
+                    <div class="bg-amber-50 p-4 rounded-lg border border-amber-100">
+                        <h4 class="font-bold text-amber-800 text-lg mb-2">🟡 الفئة الثانية: محافظات "النمو الواعد"</h4>
+                        <p class="text-amber-900 mb-2">تشمل: ${formatList(tier2)}</p>
+                        <p class="text-sm text-amber-800 leading-relaxed">
+                            تقع هذه المحافظات في المنطقة الوسطى من المؤشر. تمتلك مقومات تنموية قوية (حيث تعتبر <strong>جرش</strong> متميزة سياحياً وزراعياً، و<strong>الكرك</strong> قاعدة للصناعات الثقيلة والاستخراجية كالفوسفات والبوتاس، بالإضافة إلى السياحة في <strong>مأدبا</strong> والكثافة البشرية في <strong>إربد</strong>) لكنها تواجه فجوات في بعض المؤشرات الفرعية، غالباً في البنية التحتية أو الخدمات الصحية المتخصصة. استراتيجيتها يجب أن تركز على "سد الفجوات" واستغلال الميزات التنافسية.
+                        </p>
+                    </div>
+
+                    <div class="bg-red-50 p-4 rounded-lg border border-red-100">
+                        <h4 class="font-bold text-red-800 text-lg mb-2">🔴 الفئة الثالثة: محافظات "الأولوية التنموية"</h4>
+                        <p class="text-red-900 mb-2">تشمل: ${formatList(tier3)}</p>
+                        <p class="text-sm text-red-800 leading-relaxed">
+                            سجلت هذه المحافظات أدنى الدرجات في المؤشر العام، مما يعكس تحديات هيكلية عميقة. تعاني من ضعف في النشاط الاقتصادي، تباعد جغرافي يرفع كلفة الخدمات (خاصة في <strong>معان والمفرق</strong>)، وتحديات تضاريسية (في <strong>عجلون والطفيلة</strong>). هذه الفئة تتطلب تدخلاً حكومياً مباشراً وبرامج "تمكين اقتصادي" مكثفة لتحفيز التنمية وتقليل الفوارق.
+                        </p>
+                    </div>
+                </div>
             `;
         case 'economic_activity':
             return `
@@ -251,15 +362,20 @@ const LocalDevelopmentIndex: React.FC = () => {
         if (activeTab === 'final_ranking') {
             const analysisHtml = { __html: getAnalysisText(activeTab, FINAL_RANKING_2024) };
             return (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                    <div className="order-2 lg:order-1">
-                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">تحليل الترتيب النهائي</h3>
-                        <div className="text-gray-600 dark:text-gray-300 leading-relaxed space-y-2 prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={analysisHtml}></div>
+                <>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                        <div className="order-2 lg:order-1">
+                            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">تحليل الترتيب النهائي</h3>
+                            <div className="text-gray-600 dark:text-gray-300 leading-relaxed space-y-2 prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={analysisHtml}></div>
+                        </div>
+                        <div className="order-1 lg:order-2">
+                           <FinalRankingDisplay rankData={FINAL_RANKING_2024} scoreData={DEVELOPMENT_INDICATORS_2024} />
+                        </div>
                     </div>
-                    <div className="order-1 lg:order-2">
-                       <FinalRankingDisplay rankData={FINAL_RANKING_2024} scoreData={DEVELOPMENT_INDICATORS_2024} />
-                    </div>
-                </div>
+                    
+                    {/* New Recommendations Section */}
+                    <RecommendationsSection />
+                </>
             );
         }
 
@@ -301,9 +417,6 @@ const LocalDevelopmentIndex: React.FC = () => {
     return (
         <Card>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">مؤشر التنمية المحلية المستدامة (2024)</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-                تحليل تفصيلي للترتيب النهائي والمؤشرات الخمسة الرئيسية التي تشكل أساس التنمية في المحافظات، مع مقارنة الأداء وتقديم توصيات بناءً على النتائج. الدرجة الإجمالية لكل مؤشر فرعي هي (من 20).
-            </p>
             
             <div className="mb-8 p-6 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
                 <p className="text-gray-700 dark:text-gray-300 mb-4">

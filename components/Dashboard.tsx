@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Card from './ui/Card';
 
@@ -76,10 +77,10 @@ const Dashboard: React.FC = () => {
                                 title="مؤشر التنمية المحلية المستدامة (2024)" 
                                 aria-label="Choropleth map" 
                                 id="datawrapper-chart-JORjH" 
-                                src="https://datawrapper.dwcdn.net/JORjH/3/" 
+                                src="https://datawrapper.dwcdn.net/JORjH/5/" 
                                 scrolling="no" 
                                 frameBorder="0" 
-                                style={{ border: 'none', width: '100%', height: '100%', minHeight: '741px' }}
+                                style={{ border: 'none', width: '100%', height: '100%', minHeight: '636px' }}
                                 data-external="1">
                             </iframe>
                         </div>

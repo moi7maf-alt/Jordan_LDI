@@ -5,7 +5,6 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Document, Packer, Paragraph, TextRun, AlignmentType, IStylesOptions } from 'docx';
 import saveAs from 'file-saver';
 
-// Data a s per the 2024 Annual Statistical Report
 const NATIONAL_INDICATORS_2024 = {
     population: '11,734,000',
     birth_rate: '16.0',
@@ -41,26 +40,11 @@ const BEDS_PER_10K_GOVERNORATE = [
   { name_ar: 'جرش', rate: 6 },
 ];
 
-const HEALTH_CENTERS_BY_GOVERNORATE = [
-    { name_ar: 'عمان', total: 103 },
-    { name_ar: 'إربد', total: 121 },
-    { name_ar: 'المفرق', total: 85 },
-    { name_ar: 'الكرك', total: 55 },
-    { name_ar: 'البلقاء', total: 60 },
-    { name_ar: 'الزرقاء', total: 40 },
-    { name_ar: 'جرش', total: 27 },
-    { name_ar: 'معان', total: 38 },
-    { name_ar: 'مأدبا', total: 25 },
-    { name_ar: 'عجلون', total: 31 },
-    { name_ar: 'الطفيلة', total: 20 },
-    { name_ar: 'العقبة', total: 22 },
-];
-
 const WORKLOAD_BY_SECTOR_2024 = [
     { sector: 'وزارة الصحة', admissions: 446498, occupancy_rate: 71.4, avg_stay: 3.5, surgeries: 150541 },
     { sector: 'الخدمات الطبية', admissions: 226748, occupancy_rate: 68.6, avg_stay: 3.6, surgeries: 142946 },
     { sector: 'القطاع الخاص', admissions: 283399, occupancy_rate: 34.8, avg_stay: 2.0, surgeries: 145732 },
-    { sector: 'المستشفيات الجامعية', admissions: 70906, occupancy_rate: 64.4, avg_stay: 3.9, surgeries: 40979 }, // Aggregated
+    { sector: 'المستشفيات الجامعية', admissions: 70906, occupancy_rate: 64.4, avg_stay: 3.9, surgeries: 40979 },
 ];
 
 const CAESAREAN_RATES = [
@@ -87,7 +71,7 @@ const Health: React.FC = () => {
     const handleExportDocx = async () => {
         setIsExportingDocx(true);
         try {
-            const title = "تقرير قطاع الصحة في الأردن 2024";
+            const title = "التقرير الاستراتيجي: قطاع الصحة 2024";
             
             const docStyles: IStylesOptions = {
                 default: { document: { run: { font: "Arial", size: 24, rightToLeft: true } } },
@@ -100,24 +84,23 @@ const Health: React.FC = () => {
 
             const children = [
                 new Paragraph({ text: title, style: "h1" }),
-                new Paragraph({ text: "نظرة معمقة على البنية التحتية، حجم العمل، وكفاءة الخدمات الصحية.", style: "Normal" }),
                 
-                new Paragraph({ text: "1. المشهد الصحي الوطني (2024)", style: "h2" }),
-                new Paragraph({ text: `عدد السكان: ${NATIONAL_INDICATORS_2024.population}`, style: "Normal", bullet: { level: 0 } }),
-                new Paragraph({ text: `معدل وفيات الرضع: ${NATIONAL_INDICATORS_2024.infant_mortality} لكل 1000`, style: "Normal", bullet: { level: 0 } }),
-                new Paragraph({ text: `إجمالي الأسرّة: ${NATIONAL_INDICATORS_2024.total_beds}`, style: "Normal", bullet: { level: 0 } }),
+                new Paragraph({ text: "1. المشهد الصحي الوطني: مؤشرات الكفاءة", style: "h2" }),
+                new Paragraph({ text: `يقدم القطاع الصحي خدماته لـ ${NATIONAL_INDICATORS_2024.population} نسمة، مدعوماً ببنية تحتية تضم ${NATIONAL_INDICATORS_2024.total_hospitals} مستشفى و${NATIONAL_INDICATORS_2024.total_beds} سريراً. يعكس العمر المتوقع عند الولادة (${NATIONAL_INDICATORS_2024.life_expectancy} عاماً) جودة الرعاية العامة، لكن بقاء معدل وفيات الرضع عند ${NATIONAL_INDICATORS_2024.infant_mortality} لكل 1000 ولادة حية يستدعي مراجعة برامج رعاية الأمومة والطفولة.`, style: "Normal" }),
 
-                new Paragraph({ text: "2. تحليل البنية التحتية", style: "h2" }),
-                new Paragraph({ text: "تستحوذ وزارة الصحة على الحصة الأكبر من الأسرّة (37.1%)، يليها القطاع الخاص.", style: "Normal" }),
-                new Paragraph({ text: "يُظهر معدل الأسرّة تفاوتاً جغرافياً صارخاً. تتصدر الطفيلة وعجلون القائمة، بينما تعاني الزرقاء وجرش من نقص.", style: "Normal" }),
+                new Paragraph({ text: "2. عدالة توزيع الخدمات الصحية", style: "h2" }),
+                new Paragraph({ text: "يكشف تحليل توزيع الأسرّة عن فجوة جغرافية حادة. بينما تتمتع محافظة الطفيلة بأعلى معدل (26 سريراً لكل 10,000 نسمة) وعجلون (20)، تعاني محافظات ذات كثافة سكانية عالية من نقص واضح. ففي الزرقاء، ينخفض المعدل إلى 7 أسرّة فقط، وفي جرش إلى 6 أسرّة، وهو أقل بكثير من المعدل الوطني (14). هذا التفاوت يفرض ضغطاً هائلاً على مستشفيات العاصمة ويؤدي إلى رحلات علاجية مكلفة للمواطنين.", style: "Normal" }),
 
-                new Paragraph({ text: "3. خدمات صحة الأم والطفل", style: "h2" }),
-                new Paragraph({ text: "شكلت الولادات القيصرية نسبة مرتفعة في بعض المستشفيات مثل الأميرة بديعة (59.1%).", style: "Normal" }),
-                new Paragraph({ text: "هناك ضغط كبير على خدمات الطوارئ، حيث أن 33% فقط من المراجعين هم حالات طارئة فعلية.", style: "Normal" }),
+                new Paragraph({ text: "3. الأداء التشغيلي والضغط على القطاع العام", style: "h2" }),
+                new Paragraph({ text: "تتحمل وزارة الصحة العبء الأكبر، حيث تستحوذ على 37.1% من إجمالي الأسرّة، وتسجل أعلى نسبة إشغال (71.4%) مقارنة بالقطاع الخاص (34.8%). هذا الضغط يتجلى بوضوح في أقسام الطوارئ التي استقبلت 4.4 مليون مراجع، إلا أن 33% فقط منهم صُنفوا كحالات طارئة فعلية، مما يشير إلى خلل في نظام الرعاية الأولية واعتماد المواطنين على المستشفيات كبديل للمراكز الصحية.", style: "Normal" }),
 
-                new Paragraph({ text: "4. توصيات استراتيجية", style: "h2" }),
-                new Paragraph({ text: "خارطة طريق للاستثمار الصحي وتوجيه الاستثمار للمحافظات الأكثر حاجة.", style: "Normal", bullet: { level: 0 } }),
-                new Paragraph({ text: "تعزيز الرعاية الصحية الأولية لتخفيف الضغط عن المستشفيات.", style: "Normal", bullet: { level: 0 } }),
+                new Paragraph({ text: "4. مؤشرات حرجة: الولادات القيصرية", style: "h2" }),
+                new Paragraph({ text: "رصد التقرير ارتفاعاً مقلقاً في معدلات الولادة القيصرية، حيث وصلت في مستشفى الأميرة بديعة إلى 59.1% وفي الكرك إلى 53.3%. هذه النسب، التي تتجاوز المعدلات العالمية الموصى بها، قد تشير إلى ممارسات طبية دفاعية أو نقص في برامج التوعية والولادة الطبيعية، مما يزيد من المخاطر الصحية والتكاليف المالية.", style: "Normal" }),
+
+                new Paragraph({ text: "5. التوصيات الاستراتيجية", style: "h2" }),
+                new Paragraph({ text: "أولاً: توجيه مشاريع التوسعة الصحية الجديدة حصراً للمحافظات الأقل حظاً (الزرقاء، جرش، المفرق) لتحقيق العدالة المكانية.", style: "Normal", bullet: { level: 0 } }),
+                new Paragraph({ text: "ثانياً: تفعيل نظام الفرز الطبي في المراكز الصحية الأولية لتقليل الضغط غير المبرر على طوارئ المستشفيات.", style: "Normal", bullet: { level: 0 } }),
+                new Paragraph({ text: "ثالثاً: وضع بروتوكولات صارمة للولادات القيصرية ومراقبة المستشفيات ذات المعدلات المرتفعة.", style: "Normal", bullet: { level: 0 } }),
             ];
 
             const doc = new Document({
@@ -145,38 +128,32 @@ const Health: React.FC = () => {
             <head>
                 <title>تقرير قطاع الصحة - 2024</title>
                 <style>
-                    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+                    @import url('https://fonts.googleapis.com/css2?family=Traditional+Arabic:wght@400;700&display=swap');
                     body {
-                        font-family: 'Cairo', sans-serif;
+                        font-family: 'Traditional Arabic', serif;
                         direction: rtl;
                         padding: 40px;
                         background: white !important;
                         color: black !important;
-                        font-size: 14pt;
+                        font-size: 16pt;
+                        line-height: 1.6;
                     }
-                    * {
-                        box-shadow: none !important;
-                        background: transparent !important;
-                        border-radius: 0 !important;
-                        border: none !important;
-                    }
-                    .grid, .flex { display: block !important; }
-                    .no-print, .recharts-wrapper, button { display: none !important; }
+                    .no-print, .recharts-wrapper, button, svg, .icon-container, .kpi-card-visual { display: none !important; }
                     
                     .card-container {
+                        box-shadow: none !important;
+                        border: none !important;
                         padding: 0 !important;
-                        margin: 0 0 20px 0 !important;
-                        border-bottom: 1px solid #eee !important;
+                        margin-bottom: 20px !important;
+                        break-inside: avoid;
                     }
                     
-                    h1 { font-size: 26pt !important; text-align: center; border-bottom: 2px solid black; margin-bottom: 20px; }
-                    h2 { font-size: 20pt !important; border-bottom: 1px solid #ccc; margin-top: 30px; break-after: avoid; }
-                    h3 { font-size: 18pt !important; color: #333; margin-top: 20px; break-after: avoid; }
-                    p, li { font-size: 14pt !important; line-height: 1.6; text-align: justify; }
+                    h1 { font-size: 28pt; font-weight: bold; text-align: center; border-bottom: 3px solid #000; margin-bottom: 30px; padding-bottom: 10px; }
+                    h2 { font-size: 22pt; font-weight: bold; border-bottom: 1px solid #666; margin-top: 30px; margin-bottom: 15px; }
+                    h3 { font-size: 18pt; font-weight: bold; margin-top: 20px; }
+                    p, li { text-align: justify; margin-bottom: 12px; }
                     
-                    .icon-container { display: inline-block !important; font-size: 16pt !important; margin-left: 10px; }
-                    
-                    @page { size: A4; margin: 20mm; }
+                    @page { size: A4; margin: 2.5cm; }
                 </style>
             </head>
         `;
@@ -186,13 +163,13 @@ const Health: React.FC = () => {
                 ${headContent}
                 <body>
                     <div class="report-header">
-                        <h1>تقرير تحليلي استراتيجي لقطاع الصحة في الأردن 2024</h1>
+                        <h1>التقرير الاستراتيجي: قطاع الصحة 2024</h1>
                     </div>
                     <div class="content">
                         ${reportElement.innerHTML}
                     </div>
-                     <div class="report-footer" style="text-align: center; margin-top: 50px; font-size: 10pt; color: #666;">
-                        وزارة الداخلية - منظومة التحليل التنموي
+                     <div class="report-footer" style="text-align: center; margin-top: 50px; font-size: 12pt; color: #666; border-top: 1px solid #ccc; padding-top: 10px;">
+                        وزارة الداخلية - مديرية التنمية المحلية | منظومة التحليل الرقمي
                     </div>
                 </body>
             </html>
@@ -218,35 +195,29 @@ const Health: React.FC = () => {
                     disabled={isExportingDocx}
                     className="px-4 py-2 text-sm font-medium text-black bg-amber-500 rounded-lg hover:bg-amber-600 focus:ring-4 focus:outline-none focus:ring-amber-300 disabled:bg-gray-400 flex items-center gap-2"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                    {isExportingDocx ? 'جاري التصدير...' : 'تصدير (DOCX)'}
+                    تصدير (DOCX)
                 </button>
                 <button onClick={handleNativePrint} className="px-4 py-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-amber-600 flex items-center gap-2">
-                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-                    طباعة / حفظ PDF (وثيقة نظيفة)
+                    طباعة (تقرير نصي)
                 </button>
             </div>
 
             <div id="report-content" className="space-y-8">
                 <header className="text-center border-b border-gray-200 dark:border-gray-700 pb-8 no-print">
-                    <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">تقرير تحليلي استراتيجي لقطاع الصحة في الأردن 2024</h1>
+                    <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">تقرير تحليلي استراتيجي لقطاع الصحة</h1>
                     <p className="text-lg text-gray-500 dark:text-gray-400 mt-2 max-w-3xl mx-auto">
-                        نظرة معمقة على البنية التحتية، حجم العمل، وكفاءة الخدمات الصحية استناداً إلى التقرير الإحصائي السنوي لوزارة الصحة.
+                        نظرة معمقة على البنية التحتية، حجم العمل، وكفاءة الخدمات الصحية استناداً إلى التقرير الإحصائي السنوي.
                     </p>
                 </header>
                 
-                <div className="report-intro">
-                    <p className="text-lg text-gray-700 mb-6">
-                        يقدم هذا التقرير تحليلاً شاملاً لواقع البنية التحتية الصحية، حجم العمل، وكفاءة الخدمات في المملكة، استناداً إلى بيانات التقرير الإحصائي السنوي لوزارة الصحة لعام 2024. يهدف التقرير إلى تحديد أبرز التحديات وتقديم توصيات استراتيجية لدعم صناع القرار.
-                    </p>
-                </div>
-
                 <Card className="card-container">
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">1. المشهد الصحي الوطني: مؤشرات رئيسية لعام 2024</h2>
-                    <p className="text-gray-600 dark:text-gray-300 mb-6 text-lg">يبلغ عدد سكان الأردن {NATIONAL_INDICATORS_2024.population} نسمة. يعكس العمر المتوقع عند الولادة ({NATIONAL_INDICATORS_2024.life_expectancy} عاماً) تحسناً في الظروف الصحية. ومع ذلك، لا يزال معدل وفيات الرضع عند {NATIONAL_INDICATORS_2024.infant_mortality} لكل 1000 ولادة حية يمثل تحدياً.</p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 text-center">
+                    <div className="text-gray-700 dark:text-gray-300 mb-6 text-lg leading-relaxed">
+                        <p>
+                            يقدم القطاع الصحي خدماته لـ <strong>{NATIONAL_INDICATORS_2024.population}</strong> نسمة، مدعوماً ببنية تحتية تضم <strong>{NATIONAL_INDICATORS_2024.total_hospitals}</strong> مستشفى و<strong>{NATIONAL_INDICATORS_2024.total_beds}</strong> سريراً. يعكس العمر المتوقع عند الولادة (<strong>{NATIONAL_INDICATORS_2024.life_expectancy}</strong> عاماً) جودة الرعاية العامة، لكن بقاء معدل وفيات الرضع عند <strong>{NATIONAL_INDICATORS_2024.infant_mortality}</strong> لكل 1000 ولادة حية يستدعي مراجعة برامج رعاية الأمومة والطفولة.
+                        </p>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 text-center kpi-card-visual">
                         {KPI_CARD_DATA.map(item => (
                             <div key={item.title} className="bg-gray-100 dark:bg-slate-800 p-4 rounded-xl break-inside-avoid">
                                 <div className="text-3xl mb-2 icon-container">{item.icon}</div>
@@ -258,126 +229,61 @@ const Health: React.FC = () => {
                 </Card>
 
                 <Card className="card-container">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">2. تحليل البنية التحتية للقطاع الصحي</h2>
-                    <p className="text-gray-600 dark:text-gray-300 mb-6 text-lg">تتكون البنية التحتية الصحية من شبكة متنوعة من المستشفيات والمراكز الصحية التابعة لقطاعات متعددة، ويكشف توزيعها عن فجوات جغرافية واضحة.</p>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 text-center">توزيع الأسرّة حسب القطاع (إجمالي: {NATIONAL_INDICATORS_2024.total_beds})</h3>
-                            <div style={{ height: 300 }} className="no-print">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <PieChart>
-                                        <Pie data={BEDS_BY_SECTOR_2024} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} labelLine={false} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
-                                            {BEDS_BY_SECTOR_2024.map((entry, index) => <Cell key={`cell-${index}`} fill={['#3b82f6', '#10b981', '#f97316', '#8b5cf6'][index % 4]} />)}
-                                        </Pie>
-                                        <Tooltip formatter={(value: number) => `${value.toLocaleString()} سرير`} />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            </div>
-                            <p className="text-gray-700 mt-4">
-                                يبلغ إجمالي عدد الأسرّة في المملكة {NATIONAL_INDICATORS_2024.total_beds} سريراً. تستحوذ وزارة الصحة على الحصة الأكبر بنسبة 37.1%، يليها القطاع الخاص بنسبة 34.6%.
-                            </p>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">2. تحليل البنية التحتية: فجوات العدالة المكانية</h2>
+                    <div className="text-gray-700 dark:text-gray-300 mb-6 text-lg leading-relaxed">
+                        <p>
+                            يكشف تحليل توزيع الأسرّة عن فجوة جغرافية حادة تعيق الوصول العادل للخدمات. بينما تتمتع محافظة <strong>الطفيلة</strong> بأعلى معدل (<strong>26</strong> سريراً لكل 10,000 نسمة) وعجلون (20)، تعاني محافظات ذات كثافة سكانية عالية من نقص واضح. ففي <strong>الزرقاء</strong>، ينخفض المعدل إلى <strong>7</strong> أسرّة فقط، وفي <strong>جرش</strong> إلى <strong>6</strong> أسرّة، وهو أقل بكثير من المعدل الوطني (14). هذا التفاوت يفرض ضغطاً هائلاً على مستشفيات العاصمة ويؤدي إلى رحلات علاجية مكلفة للمواطنين.
+                        </p>
+                        <p className="mt-4">
+                            على صعيد الملكية، تستحوذ وزارة الصحة على الحصة الأكبر بنسبة 37.1% من إجمالي الأسرة، يليها القطاع الخاص بنسبة 34.6%، مما يؤكد الدور المحوري للقطاع العام في الأمن الصحي.
+                        </p>
+                    </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 no-print">
+                        <div style={{ height: 300 }}>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie data={BEDS_BY_SECTOR_2024} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} labelLine={false} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                                        {BEDS_BY_SECTOR_2024.map((entry, index) => <Cell key={`cell-${index}`} fill={['#3b82f6', '#10b981', '#f97316', '#8b5cf6'][index % 4]} />)}
+                                    </Pie>
+                                    <Tooltip formatter={(value: number) => `${value.toLocaleString()} سرير`} />
+                                </PieChart>
+                            </ResponsiveContainer>
                         </div>
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 text-center">معدل الأسرّة لكل 10,000 نسمة حسب المحافظة</h3>
-                            <div style={{ height: 300 }} className="no-print">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={[...BEDS_PER_10K_GOVERNORATE].sort((a,b) => b.rate - a.rate)} margin={{ top: 20, right: 20, left: -10, bottom: 5 }}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(128, 128, 128, 0.2)" />
-                                        <XAxis dataKey="name_ar" tick={{ fontSize: 11, fill: '#9ca3af' }} />
-                                        <YAxis domain={[0, 'dataMax + 5']} tick={{ fontSize: 11, fill: '#9ca3af' }}/>
-                                        <Tooltip formatter={(value: number) => [value, "المعدل"]} contentStyle={{ backgroundColor: 'rgba(31, 41, 55, 0.8)', borderColor: '#4b5563' }} />
-                                        <Bar dataKey="rate" name="المعدل" fill="#0ea5e9">
-                                            <LabelList dataKey="rate" position="top" style={{ fill: '#6b7280', fontSize: '11px' }} />
-                                        </Bar>
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
-                            <p className="text-gray-700 mt-4">
-                                يُظهر المعدل تفاوتاً جغرافياً صارخاً. تتصدر محافظات الطفيلة (26) وعجلون (20) القائمة، بينما تعاني الزرقاء (7) وجرش (6) من نقص حاد.
-                            </p>
+                        <div style={{ height: 300 }}>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={[...BEDS_PER_10K_GOVERNORATE].sort((a,b) => b.rate - a.rate)} margin={{ top: 20, right: 20, left: -10, bottom: 5 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(128, 128, 128, 0.2)" />
+                                    <XAxis dataKey="name_ar" tick={{ fontSize: 11, fill: '#9ca3af' }} />
+                                    <YAxis domain={[0, 'dataMax + 5']} tick={{ fontSize: 11, fill: '#9ca3af' }}/>
+                                    <Tooltip formatter={(value: number) => [value, "المعدل"]} />
+                                    <Bar dataKey="rate" name="المعدل" fill="#0ea5e9">
+                                        <LabelList dataKey="rate" position="top" style={{ fill: '#6b7280', fontSize: '11px' }} />
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
                         </div>
                     </div>
                 </Card>
 
                 <Card className="card-container">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">3. حجم العمل وكفاءة المستشفيات (2024)</h2>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-right text-gray-500 dark:text-gray-400">
-                            <thead className="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
-                                <tr>
-                                    <th scope="col" className="px-4 py-3">القطاع</th>
-                                    <th scope="col" className="px-4 py-3">حالات الإدخال</th>
-                                    <th scope="col" className="px-4 py-3">نسبة الإشغال (%)</th>
-                                    <th scope="col" className="px-4 py-3">متوسط الإقامة (يوم)</th>
-                                    <th scope="col" className="px-4 py-3">العمليات الجراحية</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {WORKLOAD_BY_SECTOR_2024.map((item) => (
-                                    <tr key={item.sector} className="bg-white border-b dark:bg-slate-800 dark:border-gray-700">
-                                        <th scope="row" className="px-4 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{item.sector}</th>
-                                        <td className="px-4 py-4">{item.admissions.toLocaleString()}</td>
-                                        <td className="px-4 py-4">{item.occupancy_rate.toFixed(1)}%</td>
-                                        <td className="px-4 py-4">{item.avg_stay.toFixed(1)}</td>
-                                        <td className="px-4 py-4">{item.surgeries.toLocaleString()}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">3. الأداء التشغيلي وجودة الخدمات</h2>
+                    <div className="text-gray-700 dark:text-gray-300 mb-6 text-lg leading-relaxed">
+                        <p>
+                            تواجه مستشفيات وزارة الصحة ضغطاً تشغيلياً هائلاً، حيث سجلت أعلى نسبة إشغال (71.4%) مقارنة بالقطاع الخاص (34.8%). هذا الضغط يتجلى بوضوح في <strong>أقسام الطوارئ</strong> التي استقبلت 4.4 مليون مراجع، إلا أن <strong>33% فقط منهم</strong> صُنفوا كحالات طارئة فعلية، مما يشير إلى خلل في نظام الرعاية الأولية واعتماد المواطنين على المستشفيات كبديل للمراكز الصحية.
+                        </p>
+                        <p className="mt-4">
+                            كما رصد التقرير ارتفاعاً مقلقاً في <strong>معدلات الولادة القيصرية</strong>، حيث وصلت في مستشفى الأميرة بديعة إلى <strong>59.1%</strong> وفي الكرك إلى 53.3%. هذه النسب، التي تتجاوز المعدلات العالمية الموصى بها، قد تشير إلى ممارسات طبية دفاعية أو نقص في برامج التوعية والولادة الطبيعية.
+                        </p>
                     </div>
                 </Card>
 
                 <Card className="card-container">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">4. خدمات صحة الأم والطفل والخدمات المتخصصة</h2>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">معدلات الولادة القيصرية (2024)</h3>
-                            <div style={{ height: 300 }} className="no-print">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={CAESAREAN_RATES} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(128, 128, 128, 0.2)" />
-                                        <XAxis type="number" unit="%" domain={[0, 70]} tick={{ fontSize: 11, fill: '#9ca3af' }} />
-                                        <YAxis type="category" dataKey="hospital" width={100} tick={{ fontSize: 11, fill: '#9ca3af' }} />
-                                        <Tooltip formatter={(value: number) => `${value.toFixed(1)}%`} contentStyle={{ backgroundColor: 'rgba(31, 41, 55, 0.8)' }} />
-                                        <Bar dataKey="rate" name="المعدل" fill="#f43f5e" >
-                                            <LabelList dataKey="rate" position="right" formatter={(value: number) => `${value.toFixed(1)}%`} style={{ fill: '#6b7280', fontSize: '11px' }} />
-                                        </Bar>
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
-                            <p className="text-gray-700 mt-2">شكلت الولادات القيصرية 38.4% من الإجمالي. الارتفاع في مستشفيات مثل الأميرة بديعة (59.1%) يتطلب المراجعة.</p>
-                        </div>
-                        <div className="space-y-4">
-                            <div className="bg-gray-100 dark:bg-slate-800 p-4 rounded-lg break-inside-avoid">
-                                <h4 className="font-semibold text-gray-800 dark:text-white">مراجعات الطوارئ</h4>
-                                <p className="text-3xl font-bold text-red-500">4.4 مليون</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">إجمالي المراجعين لأقسام الطوارئ في مستشفيات وزارة الصحة.</p>
-                                <p className="text-lg font-semibold mt-2">33% فقط حالات طارئة</p>
-                            </div>
-                            <div className="bg-gray-100 dark:bg-slate-800 p-4 rounded-lg break-inside-avoid">
-                                <h4 className="font-semibold text-gray-800 dark:text-white">مرضى غسيل الكلى</h4>
-                                <p className="text-3xl font-bold text-blue-500">1,909 مريض</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">في وحدات غسيل الكلى بمستشفيات وزارة الصحة.</p>
-                                <p className="text-lg font-semibold mt-2">~22,500 جلسة علاجية</p>
-                            </div>
-                        </div>
-                    </div>
-                </Card>
-
-                <Card className="card-container">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">5. تحديات استراتيجية وتوصيات</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">4. التوصيات الاستراتيجية</h2>
                     <div className="text-gray-600 dark:text-gray-300 leading-relaxed space-y-4 text-lg">
-                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white pt-2">أبرز التحديات:</h3>
                         <ul className="list-disc list-outside mr-6 space-y-2">
-                            <li><strong>التوزيع غير العادل للموارد:</strong> تركز الخدمات الصحية المتخصصة والقدرة السريرية في العاصمة، مقابل نقص حاد في المحافظات الطرفية.</li>
-                            <li><strong>الضغط على خدمات الطوارئ:</strong> استخدام أقسام الطوارئ للحالات غير الطارئة يستنزف الموارد.</li>
-                            <li><strong>ارتفاع معدلات الولادة القيصرية:</strong> النسب المرتفعة تتطلب تحليلاً للأسباب ووضع بروتوكولات.</li>
-                        </ul>
-                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white pt-4">توصيات استراتيجية:</h3>
-                        <ul className="list-disc list-outside mr-6 space-y-2">
-                            <li><strong>خارطة طريق للاستثمار الصحي:</strong> توجيه الاستثمار للمحافظات الأكثر حاجة (الزرقاء، جرش، مأدبا).</li>
-                            <li><strong>تعزيز الرعاية الصحية الأولية:</strong> توعية المواطنين وتوسيع ساعات عمل المراكز الشاملة.</li>
-                            <li><strong>استخدام البيانات لتحسين الكفاءة:</strong> تحليل بيانات حجم العمل لتوجيه الموارد البشرية والمالية.</li>
+                            <li><strong>إعادة توجيه الاستثمار:</strong> توجيه مشاريع التوسعة الصحية الجديدة حصراً للمحافظات الأقل حظاً (الزرقاء، جرش، المفرق) لتحقيق العدالة المكانية في توزيع الأسرة.</li>
+                            <li><strong>تفعيل الرعاية الأولية:</strong> تعزيز دور المراكز الصحية الشاملة وتمديد ساعات عملها لتقليل الضغط غير المبرر على طوارئ المستشفيات.</li>
+                            <li><strong>ضبط الجودة السريرية:</strong> وضع بروتوكولات صارمة للولادات القيصرية ومراقبة المستشفيات ذات المعدلات المرتفعة لضمان سلامة الأمهات وترشيد النفقات.</li>
                         </ul>
                     </div>
                 </Card>

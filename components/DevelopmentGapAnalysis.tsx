@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import Card from './ui/Card';
 import { generateComparativeAnalysis, ComparativeGovData } from '../services/geminiService';
@@ -136,44 +137,49 @@ const DevelopmentGapAnalysis: React.FC = () => {
 
     return (
         <Card>
-            <h2 className="text-xl font-bold text-gray-900 mb-2 text-center">تحليل الفجوة التنموية بين المحافظات</h2>
-            <p className="text-sm text-gray-500 mb-6 text-center">اختر محافظتين لمقارنة مؤشراتهما التنموية الرئيسية والحصول على تحليل للفجوات مدعوم بالذكاء الاصطناعي.</p>
+            <div className="py-4 mb-6 border-b border-gray-100">
+                <h2 className="text-3xl font-extrabold text-gray-900 mb-3 text-center text-amber-600">تحليل الفجوة التنموية بين المحافظات</h2>
+                <p className="text-xl text-gray-700 text-center font-medium max-w-4xl mx-auto leading-relaxed">
+                    اختر محافظتين لمقارنة مؤشراتهما التنموية الرئيسية والحصول على تحليل للفجوات مدعوم بالذكاء الاصطناعي.
+                </p>
+            </div>
 
-            <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-6 p-4 bg-gray-100 rounded-lg">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-6 p-6 bg-slate-50 rounded-xl border border-slate-200 shadow-sm">
                 <select
                     value={gov1}
                     onChange={(e) => setGov1(e.target.value)}
-                    className="w-full md:w-1/3 bg-white border border-gray-300 rounded-md p-2 text-sm"
+                    className="w-full md:w-1/3 bg-white border border-gray-300 rounded-lg p-3 text-base font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
                 >
                     {GOVERNORATES_DATA.map(g => <option key={g.name} value={g.name}>{g.name_ar}</option>)}
                 </select>
-                <span className="font-semibold">مقابل</span>
+                <span className="font-bold text-gray-500 text-lg px-2">مقابل</span>
                 <select
                     value={gov2}
                     onChange={(e) => setGov2(e.target.value)}
-                    className="w-full md:w-1/3 bg-white border border-gray-300 rounded-md p-2 text-sm"
+                    className="w-full md:w-1/3 bg-white border border-gray-300 rounded-lg p-3 text-base font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
                 >
                      {GOVERNORATES_DATA.map(g => <option key={g.name} value={g.name}>{g.name_ar}</option>)}
                 </select>
                 <button
                     onClick={handleAnalysis}
                     disabled={isLoading}
-                    className="w-full md:w-auto px-6 py-2 text-black bg-amber-500 rounded-md disabled:bg-gray-400 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 font-semibold"
+                    className="w-full md:w-auto px-8 py-3 text-black bg-amber-500 rounded-lg disabled:bg-gray-400 hover:bg-amber-600 focus:outline-none focus:ring-4 focus:ring-amber-300 font-bold text-base transition-colors shadow-sm"
                 >
-                    {isLoading ? '...جاري التحليل' : 'تحليل'}
+                    {isLoading ? '...جاري التحليل' : 'تحليل الفجوة'}
                 </button>
             </div>
 
-            {error && <p className="text-red-500 text-center">{error}</p>}
+            {error && <p className="text-red-500 text-center font-medium">{error}</p>}
             
             {isLoading && (
-                <div className="flex justify-center items-center p-8">
-                    <div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+                <div className="flex flex-col justify-center items-center p-12">
+                    <div className="w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                    <p className="text-gray-500 font-medium">جاري معالجة البيانات وإنشاء التحليل...</p>
                 </div>
             )}
 
             {analysisResult && (
-                <div className="mt-8 space-y-4">
+                <div className="mt-8 space-y-6">
                     <AnalysisSection title="التعليم" content={analysisResult.education} icon="🎓" />
                     <AnalysisSection title="الصحة" content={analysisResult.health} icon="⚕️" />
                     <AnalysisSection title="الاقتصاد" content={analysisResult.economy} icon="💼" />

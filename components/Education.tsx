@@ -6,8 +6,6 @@ import { GOVERNORATE_COLORS } from '../constants/colors';
 import { Document, Packer, Paragraph, TextRun, AlignmentType, IStylesOptions } from 'docx';
 import saveAs from 'file-saver';
 
-// Data extracted from "التقرير الإحصائي للعام الدراسي 2024-2023"
-
 const NATIONAL_KPI_DATA = {
     totalStudents: "2,307,110",
     totalSchools: "7,649",
@@ -76,7 +74,7 @@ const RENTED_SCHOOLS_MOE = [
 ];
 
 const KpiCard: React.FC<{ title: string; value: string; icon: string; }> = ({ title, value, icon }) => (
-    <div className="bg-gray-100 dark:bg-slate-800 p-4 rounded-xl text-center shadow-sm break-inside-avoid card-container">
+    <div className="bg-gray-100 dark:bg-slate-800 p-4 rounded-xl text-center shadow-sm break-inside-avoid card-container kpi-card-visual">
         <div className="text-3xl mb-2 icon-container">{icon}</div>
         <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{value}</p>
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{title}</p>
@@ -89,7 +87,7 @@ const Education: React.FC = () => {
     const handleExportDocx = async () => {
         setIsExportingDocx(true);
         try {
-            const title = "تقرير قطاع التعليم في الأردن 2024";
+            const title = "التقرير الاستراتيجي: قطاع التعليم 2024";
             
             const docStyles: IStylesOptions = {
                 default: { document: { run: { font: "Arial", size: 24, rightToLeft: true } } },
@@ -102,27 +100,22 @@ const Education: React.FC = () => {
 
             const children = [
                 new Paragraph({ text: title, style: "h1" }),
-                new Paragraph({ text: "نظرة معمقة على البنية التحتية، كفاءة الموارد، وجودة الكوادر التعليمية.", style: "Normal" }),
                 
-                new Paragraph({ text: "1. المشهد التعليمي الوطني", style: "h2" }),
-                new Paragraph({ text: `إجمالي الطلبة: ${NATIONAL_KPI_DATA.totalStudents}`, style: "Normal", bullet: { level: 0 } }),
-                new Paragraph({ text: `إجمالي المدارس: ${NATIONAL_KPI_DATA.totalSchools}`, style: "Normal", bullet: { level: 0 } }),
-                new Paragraph({ text: `إجمالي المعلمين: ${NATIONAL_KPI_DATA.totalTeachers}`, style: "Normal", bullet: { level: 0 } }),
+                new Paragraph({ text: "1. المشهد التعليمي الوطني: ضخامة الأرقام وتحديات الموارد", style: "h2" }),
+                new Paragraph({ text: `يحتضن النظام التعليمي في الأردن أكثر من ${NATIONAL_KPI_DATA.totalStudents} طالب وطالبة، موزعين على ${NATIONAL_KPI_DATA.totalSchools} مدرسة. هذه الأرقام الضخمة تضع ضغطاً هائلاً على الموارد، حيث بلغ عدد المعلمين ${NATIONAL_KPI_DATA.totalTeachers}. ورغم أن موازنة الوزارة بلغت ${NATIONAL_KPI_DATA.moeBudget}، إلا أن الجزء الأكبر منها يذهب للنفقات الجارية (الرواتب)، مما يترك هامشاً ضيقاً للتطوير الرأسمالي وتحسين البنية التحتية.`, style: "Normal" }),
 
-                new Paragraph({ text: "2. تحليل البنية التحتية وتوزيع الطلبة", style: "h2" }),
-                new Paragraph({ text: "تستوعب محافظة العاصمة وحدها ما يقارب 37% من إجمالي طلبة المملكة. هذا التركز السكاني يضع تحديات كبيرة أمام توفير بنية تحتية تعليمية كافية.", style: "Normal" }),
-                new Paragraph({ text: "تعاني محافظات مثل الزرقاء وجرش من نسب مرتفعة للمدارس المستأجرة، مما يؤثر على استقرار البيئة التعليمية.", style: "Normal" }),
+                new Paragraph({ text: "2. اختلالات التوزيع الديموغرافي والبنية التحتية", style: "h2" }),
+                new Paragraph({ text: "تشير البيانات إلى تركز سكاني وطلابي كثيف في العاصمة عمان، التي تستوعب وحدها ما يقارب 37% من إجمالي طلبة المملكة (844,395 طالب)، تليها إربد (421,817 طالب) ثم الزرقاء (310,545 طالب). هذا التباين يخلق ضغطاً شديداً على البنية التحتية في المدن الكبرى، بينما تعاني مناطق الأطراف من تشتت المدارس وارتفاع كلفة الطالب.", style: "Normal" }),
+                new Paragraph({ text: "أزمة المدارس المستأجرة لا تزال تشكل تحدياً جوهرياً لاستدامة البيئة التعليمية. تسجل محافظة الطفيلة أعلى نسبة للمدارس المستأجرة بواقع 37.6%، تليها عجلون (34.0%) والكرك (33.9%). هذه المباني غالباً ما تكون غير مصممة أصلاً كمدارس، وتفتقر للمرافق الأساسية كالساحات والمختبرات، مما يؤثر سلباً على جودة التعليم.", style: "Normal" }),
 
-                new Paragraph({ text: "3. كفاءة النظام التعليمي وجودة الكوادر", style: "h2" }),
-                new Paragraph({ text: "تظهر محافظات الجنوب أفضل أداء في نسبة الطلبة للمعلمين، بينما تواجه الزرقاء والعاصمة تحدي الاكتظاظ.", style: "Normal" }),
-                new Paragraph({ text: "تتميز محافظات الشمال بنسب مرتفعة من المعلمين حملة الشهادات العليا.", style: "Normal" }),
+                new Paragraph({ text: "3. جودة التعليم: الكثافة الصفية وكفاءة المعلمين", style: "h2" }),
+                new Paragraph({ text: "يُظهر مؤشر 'نسبة الطلبة لكل معلم' تبايناً واضحاً في الجودة. فبينما تعاني الزرقاء من اكتظاظ واضح بنسبة تصل إلى 20.5 طالب لكل معلم في المدارس الحكومية، وعمان بنسبة 19.1، تتمتع محافظات الجنوب بنسب مريحة جداً (الطفيلة 10.6، الكرك 11.4)، مما يتيح فرصة أكبر للتركيز الفردي على الطلبة. ومع ذلك، فإن انخفاض النسبة في الجنوب قد يعكس أيضاً تشتت السكان وصغر حجم المدارس.", style: "Normal" }),
+                new Paragraph({ text: "من حيث المؤهلات، تتفوق محافظات الشمال، حيث تسجل جرش أعلى نسبة للمعلمين من حملة الشهادات العليا (9.7%)، تليها إربد (8.7%). في المقابل، تنخفض هذه النسبة بشكل ملحوظ في العقبة (2.6%) والطفيلة (2.9%)، مما يستدعي برامج ابتعاث وتحفيز لرفع كفاءة الكادر التعليمي في الجنوب.", style: "Normal" }),
 
-                new Paragraph({ text: "4. تحديات استراتيجية وتوصيات", style: "h2" }),
-                new Paragraph({ text: "الاكتظاظ الطلابي في المحافظات الكبرى.", style: "Normal", bullet: { level: 0 } }),
-                new Paragraph({ text: "البنية التحتية غير المستدامة (المدارس المستأجرة).", style: "Normal", bullet: { level: 0 } }),
-                new Paragraph({ text: "التفاوت في جودة الكوادر بين المحافظات.", style: "Normal", bullet: { level: 0 } }),
-                new Paragraph({ text: "توصية: خطة وطنية للتخلص من المدارس المستأجرة.", style: "Normal", bullet: { level: 0 } }),
-                new Paragraph({ text: "توصية: إعادة توزيع الكوادر التعليمية وتقديم حوافز للمناطق النائية.", style: "Normal", bullet: { level: 0 } }),
+                new Paragraph({ text: "4. التوصيات الاستراتيجية", style: "h2" }),
+                new Paragraph({ text: "أولاً: إطلاق خطة وطنية عاجلة للتخلص من المدارس المستأجرة، مع إعطاء الأولوية للمحافظات ذات النسب الحرجة (الطفيلة، عجلون، الكرك) لضمان بيئة تعليمية آمنة.", style: "Normal", bullet: { level: 0 } }),
+                new Paragraph({ text: "ثانياً: إعادة هندسة الموارد البشرية لمعالجة سوء التوزيع، عبر تقديم حوافز مادية مجزية للمعلمين المؤهلين للعمل في مناطق البادية والجنوب لردم فجوة المؤهلات العلمية.", style: "Normal", bullet: { level: 0 } }),
+                new Paragraph({ text: "ثالثاً: تبني حلول المدارس المجمعة (Hub Schools) في المناطق النائية، مع توفير نظام نقل مدرسي فعال، بدلاً من الإبقاء على مدارس صغيرة ومستأجرة وغير فعالة.", style: "Normal", bullet: { level: 0 } }),
             ];
 
             const doc = new Document({
@@ -150,129 +143,32 @@ const Education: React.FC = () => {
             <head>
                 <title>تقرير قطاع التعليم - 2024</title>
                 <style>
-                    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
-                    
+                    @import url('https://fonts.googleapis.com/css2?family=Traditional+Arabic:wght@400;700&display=swap');
                     body {
-                        font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        font-family: 'Traditional Arabic', serif;
                         direction: rtl;
                         padding: 40px;
-                        background-color: white !important;
+                        background: white !important;
                         color: black !important;
-                        -webkit-print-color-adjust: exact;
-                        print-color-adjust: exact;
-                        font-size: 14pt;
+                        font-size: 16pt;
+                        line-height: 1.6;
                     }
-
-                    * {
-                        box-shadow: none !important;
-                        text-shadow: none !important;
-                        background-color: transparent !important;
-                        border-radius: 0 !important;
-                        border: none !important;
-                    }
+                    .no-print, .recharts-wrapper, button, svg, .icon-container, .kpi-card-visual { display: none !important; }
                     
-                    .no-print {
-                        display: none !important;
-                    }
-
-                    .grid, .flex {
-                        display: block !important;
-                    }
-                    
-                    .grid-cols-1, .grid-cols-2, .grid-cols-4, .sm\\:grid-cols-4 {
-                        display: block !important;
-                        width: 100% !important;
-                    }
-
                     .card-container {
-                         padding: 10px 0 !important;
-                         border-bottom: 1px solid #eee !important;
-                         margin-bottom: 15px !important;
-                         page-break-inside: avoid !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        padding: 0 !important;
+                        margin-bottom: 20px !important;
+                        break-inside: avoid;
                     }
                     
-                    h1 {
-                        font-size: 24pt !important;
-                        font-weight: bold !important;
-                        text-align: center !important;
-                        border-bottom: 2px solid #000 !important;
-                        padding-bottom: 15px !important;
-                        margin-bottom: 30px !important;
-                        color: #000 !important;
-                    }
-
-                    h2 {
-                        font-size: 20pt !important;
-                        font-weight: bold !important;
-                        color: #000 !important; 
-                        border-bottom: 1px solid #ccc !important;
-                        padding-bottom: 8px !important;
-                        margin-top: 30px !important;
-                        margin-bottom: 15px !important;
-                        break-after: avoid !important;
-                    }
-
-                    h3 {
-                        font-size: 16pt !important;
-                        font-weight: bold !important;
-                        color: #333 !important;
-                        margin-top: 20px !important;
-                        break-after: avoid !important;
-                    }
-
-                    p, li {
-                        font-size: 14pt !important;
-                        line-height: 1.6 !important;
-                        text-align: justify !important;
-                        margin-bottom: 10px !important;
-                        color: #000 !important;
-                        page-break-inside: avoid !important;
-                    }
-
-                    .icon-container {
-                        font-size: 16pt !important;
-                        margin: 0 !important;
-                        display: inline-block !important;
-                    }
+                    h1 { font-size: 28pt; font-weight: bold; text-align: center; border-bottom: 3px solid #000; margin-bottom: 30px; padding-bottom: 10px; }
+                    h2 { font-size: 22pt; font-weight: bold; border-bottom: 1px solid #666; margin-top: 30px; margin-bottom: 15px; }
+                    h3 { font-size: 18pt; font-weight: bold; margin-top: 20px; }
+                    p, li { text-align: justify; margin-bottom: 12px; }
                     
-                    .recharts-wrapper {
-                        width: 100% !important;
-                        height: 350px !important;
-                        display: block !important;
-                        margin: 20px auto !important;
-                        overflow: visible !important;
-                    }
-                    
-                    .recharts-surface {
-                        width: 100% !important;
-                        height: 100% !important;
-                        overflow: visible !important;
-                    }
-                    
-                    div[style*="width: 100%"] {
-                        width: 100% !important;
-                    }
-
-                    .report-header {
-                        text-align: center;
-                        border-bottom: 2px solid #333;
-                        margin-bottom: 30px;
-                        padding-bottom: 20px;
-                    }
-                    
-                    .report-footer {
-                        margin-top: 50px;
-                        text-align: center;
-                        font-size: 12px;
-                        color: #666;
-                        border-top: 1px solid #eee;
-                        padding-top: 10px;
-                    }
-                    
-                    @page {
-                        size: A4;
-                        margin: 15mm 20mm;
-                    }
+                    @page { size: A4; margin: 2.5cm; }
                 </style>
             </head>
         `;
@@ -282,13 +178,13 @@ const Education: React.FC = () => {
                 ${headContent}
                 <body>
                     <div class="report-header">
-                        <h1>تقرير تحليلي استراتيجي لقطاع التعليم في الأردن 2024</h1>
+                        <h1>التقرير الاستراتيجي: قطاع التعليم 2024</h1>
                     </div>
                     <div class="content">
                         ${reportElement.innerHTML}
                     </div>
-                    <div class="report-footer">
-                        تم توليد هذا التقرير آلياً بواسطة منظومة التحليل التنموي - وزارة الداخلية.
+                    <div class="report-footer" style="text-align: center; margin-top: 50px; font-size: 12pt; color: #666; border-top: 1px solid #ccc; padding-top: 10px;">
+                        وزارة الداخلية - مديرية التنمية المحلية | منظومة التحليل الرقمي
                     </div>
                 </body>
             </html>
@@ -313,32 +209,29 @@ const Education: React.FC = () => {
                     disabled={isExportingDocx}
                     className="px-4 py-2 text-sm font-medium text-black bg-amber-500 rounded-lg hover:bg-amber-600 focus:ring-4 focus:outline-none focus:ring-amber-300 disabled:bg-gray-400 flex items-center gap-2"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-                    {isExportingDocx ? 'جاري التصدير...' : 'تصدير (DOCX)'}
+                    تصدير (DOCX)
                 </button>
                 <button onClick={handleNativePrint} className="px-4 py-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-amber-600 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-                    طباعة / حفظ PDF (وثيقة نظيفة)
+                    طباعة (تقرير نصي)
                 </button>
             </div>
 
             <div id="report-content" className="space-y-8">
                 <header className="text-center border-b border-gray-200 dark:border-gray-700 pb-8 no-print">
-                    <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">تقرير تحليلي استراتيجي لقطاع التعليم في الأردن</h1>
+                    <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">تقرير تحليلي استراتيجي لقطاع التعليم</h1>
                     <p className="text-lg text-gray-500 dark:text-gray-400 mt-2 max-w-3xl mx-auto">
-                        نظرة معمقة على البنية التحتية، كفاءة الموارد، وجودة الكوادر التعليمية استناداً إلى بيانات 2023-2024.
+                        نظرة معمقة على البنية التحتية، كفاءة الموارد، وجودة الكوادر التعليمية استناداً إلى بيانات 2024.
                     </p>
                 </header>
                 
-                <div className="report-section">
-                    <p className="text-lg text-gray-700 mb-6">
-                        يقدم هذا التقرير تحليلاً شاملاً لواقع البنية التحتية التعليمية، كفاءة الموارد، وجودة الكوادر في المملكة، استناداً إلى بيانات التقرير الإحصائي للعام الدراسي 2023-2024 الصادر عن وزارة التربية والتعليم. يهدف التقرير إلى تسليط الضوء على الفجوات والتحديات الرئيسية، وتقديم توصيات استراتيجية لدعم صناع القرار.
-                    </p>
-                </div>
-
                 <Card className="card-container">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">1. المشهد التعليمي الوطني: مؤشرات رئيسية</h2>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">1. المشهد التعليمي الوطني: ضخامة الأرقام وتحديات الموارد</h2>
+                    <div className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
+                        <p>
+                            يحتضن النظام التعليمي في الأردن أكثر من <strong>{NATIONAL_KPI_DATA.totalStudents}</strong> طالب وطالبة، موزعين على <strong>{NATIONAL_KPI_DATA.totalSchools}</strong> مدرسة. هذه الأرقام الضخمة تضع ضغطاً هائلاً على الموارد، حيث بلغ عدد المعلمين <strong>{NATIONAL_KPI_DATA.totalTeachers}</strong>. ورغم أن موازنة الوزارة بلغت <strong>{NATIONAL_KPI_DATA.moeBudget}</strong>، إلا أن الجزء الأكبر منها يذهب للنفقات الجارية (الرواتب)، مما يترك هامشاً ضيقاً للتطوير الرأسمالي وتحسين البنية التحتية.
+                        </p>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center kpi-card-visual">
                         <KpiCard title="إجمالي الطلبة" value={NATIONAL_KPI_DATA.totalStudents} icon="👥" />
                         <KpiCard title="إجمالي المدارس" value={NATIONAL_KPI_DATA.totalSchools} icon="🏫" />
                         <KpiCard title="إجمالي المعلمين" value={NATIONAL_KPI_DATA.totalTeachers} icon="🧑‍🏫" />
@@ -347,102 +240,64 @@ const Education: React.FC = () => {
                 </Card>
                 
                 <Card className="card-container">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">2. تحليل البنية التحتية وتوزيع الطلبة</h2>
-                    <div className="space-y-10">
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2 text-center">توزيع الطلبة حسب المحافظة (2024)</h3>
-                            <p className="text-base text-gray-500 dark:text-gray-400 mb-4 text-center max-w-2xl mx-auto">تستوعب محافظة العاصمة وحدها ما يقارب 37% من إجمالي طلبة المملكة، تليها إربد (18.3%) ثم الزرقاء (13.5%). هذا التركز السكاني يضع تحديات كبيرة أمام توفير بنية تحتية تعليمية كافية في هذه المحافظات.</p>
-                            <div style={{ height: 400 }} className="no-print">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={[...STUDENTS_BY_GOVERNORATE].sort((a,b) => b.value - a.value)} layout="vertical" margin={{ top: 5, right: 50, left: 10, bottom: 5 }}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(200, 200, 200, 0.2)" />
-                                        <XAxis type="number" tickFormatter={(value) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value)} tick={{ fontSize: 12, fill: '#94a3b8' }} />
-                                        <YAxis type="category" dataKey="name_ar" width={80} tick={{ fontSize: 13, fill: '#cbd5e1' }} />
-                                        <Tooltip formatter={(value: number) => [value.toLocaleString(), "عدد الطلبة"]} contentStyle={{ backgroundColor: 'rgba(17, 24, 39, 0.9)', borderColor: '#334155' }} />
-                                        <Bar dataKey="value" name="عدد الطلبة" radius={[0, 4, 4, 0]}>
-                                            <LabelList dataKey="value" position="right" formatter={(value: number) => value.toLocaleString()} style={{ fill: '#e2e8f0', fontSize: '12px' }}  />
-                                            {STUDENTS_BY_GOVERNORATE.map(entry => <Cell key={entry.name} fill={GOVERNORATE_COLORS[entry.name]} />)}
-                                        </Bar>
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </div>
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2 text-center">نسبة المدارس المستأجرة (وزارة التربية والتعليم)</h3>
-                            <p className="text-base text-gray-500 dark:text-gray-400 mb-4 text-center max-w-2xl mx-auto">تعتبر نسبة المباني المدرسية المستأجرة مؤشراً على استدامة البنية التحتية. تظهر محافظات مثل الزرقاء وجرش نسباً مرتفعة، مما يؤثر على استقرار البيئة التعليمية، بينما تتمتع معان بأقل نسبة، مما يعكس بنية تحتية أكثر استدامة.</p>
-                            <div style={{ height: 400 }} className="no-print">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={[...RENTED_SCHOOLS_MOE].sort((a,b) => b.value - a.value)} layout="vertical" margin={{ top: 5, right: 40, left: 10, bottom: 5 }}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(200, 200, 200, 0.2)" />
-                                        <XAxis type="number" unit="%" domain={[0, 50]} tick={{ fontSize: 12, fill: '#94a3b8' }}/>
-                                        <YAxis type="category" dataKey="name_ar" width={80} tick={{ fontSize: 13, fill: '#cbd5e1' }} />
-                                        <Tooltip formatter={(value: number) => [`${value.toFixed(1)}%`, "النسبة"]} contentStyle={{ backgroundColor: 'rgba(17, 24, 39, 0.9)', borderColor: '#334155' }} />
-                                        <Bar dataKey="value" name="النسبة المئوية" fill="#f97316" radius={[0, 4, 4, 0]}>
-                                            <LabelList dataKey="value" position="right" formatter={(value: number) => `${value.toFixed(1)}%`} style={{ fill: '#e2e8f0', fontSize: '12px' }} />
-                                        </Bar>
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </div>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">2. اختلالات التوزيع الديموغرافي والبنية التحتية</h2>
+                    <div className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
+                        <p className="mb-4">
+                            تشير البيانات إلى تركز سكاني وطلابي كثيف في العاصمة عمان، التي تستوعب وحدها ما يقارب <strong>37%</strong> من إجمالي طلبة المملكة (844,395 طالب)، تليها إربد (421,817 طالب) ثم الزرقاء (310,545 طالب). هذا التباين يخلق ضغطاً شديداً على البنية التحتية في المدن الكبرى، بينما تعاني مناطق الأطراف من تشتت المدارس وارتفاع كلفة الطالب.
+                        </p>
+                        <p>
+                            أزمة المدارس المستأجرة لا تزال تشكل تحدياً جوهرياً لاستدامة البيئة التعليمية. تسجل محافظة <strong>الطفيلة</strong> أعلى نسبة للمدارس المستأجرة بواقع <strong>37.6%</strong>، تليها <strong>عجلون (34.0%)</strong> والكرك (33.9%). هذه المباني غالباً ما تكون غير مصممة أصلاً كمدارس، وتفتقر للمرافق الأساسية كالساحات والمختبرات، مما يؤثر سلباً على جودة التعليم.
+                        </p>
+                    </div>
+                    <div style={{ height: 400 }} className="no-print">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={[...STUDENTS_BY_GOVERNORATE].sort((a,b) => b.value - a.value)} layout="vertical" margin={{ top: 5, right: 50, left: 10, bottom: 5 }}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(200, 200, 200, 0.2)" />
+                                <XAxis type="number" tickFormatter={(value) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value)} tick={{ fontSize: 12, fill: '#94a3b8' }} />
+                                <YAxis type="category" dataKey="name_ar" width={80} tick={{ fontSize: 13, fill: '#cbd5e1' }} />
+                                <Tooltip formatter={(value: number) => [value.toLocaleString(), "عدد الطلبة"]} />
+                                <Bar dataKey="value" name="عدد الطلبة" radius={[0, 4, 4, 0]}>
+                                    <LabelList dataKey="value" position="right" formatter={(value: number) => value.toLocaleString()} style={{ fill: '#e2e8f0', fontSize: '12px' }}  />
+                                    {STUDENTS_BY_GOVERNORATE.map(entry => <Cell key={entry.name} fill={GOVERNORATE_COLORS[entry.name]} />)}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
                     </div>
                 </Card>
 
                 <Card className="card-container">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">3. كفاءة النظام التعليمي وجودة الكوادر</h2>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2 text-center">نسبة الطلبة لكل معلم (مدارس وزارة التربية)</h3>
-                            <p className="text-base text-gray-500 dark:text-gray-400 mb-4 text-center">يعكس هذا المؤشر كثافة الطلبة بالنسبة للكادر التعليمي. المعدلات المنخفضة تشير إلى جودة أفضل. تظهر محافظات الجنوب أفضل أداء، بينما تواجه الزرقاء والعاصمة تحدي الاكتظاظ.</p>
-                            <div style={{ height: 350 }} className="no-print">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={[...STUDENT_TEACHER_RATIO_MOE].sort((a,b) => b.value - a.value)} margin={{ top: 20, right: 20, left: -10, bottom: 5 }}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(200, 200, 200, 0.2)" />
-                                        <XAxis dataKey="name_ar" tick={{ fontSize: 12, fill: '#94a3b8' }} />
-                                        <YAxis domain={[8, 'dataMax + 2']} tick={{ fontSize: 12, fill: '#cbd5e1' }}/>
-                                        <Tooltip formatter={(value: number) => [value.toFixed(1), "طالب/معلم"]} contentStyle={{ backgroundColor: 'rgba(17, 24, 39, 0.9)', borderColor: '#334155' }} />
-                                        <Bar dataKey="value" name="النسبة" fill="#a855f7" radius={[4, 4, 0, 0]}>
-                                            <LabelList dataKey="value" position="top" style={{ fill: '#e2e8f0', fontSize: '12px' }} />
-                                        </Bar>
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </div>
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2 text-center">نسبة المعلمين حملة الشهادات العليا (%)</h3>
-                            <p className="text-base text-gray-500 dark:text-gray-400 mb-4 text-center">يعكس هذا المؤشر مستوى تأهيل الكادر التعليمي. تتميز محافظات الشمال بنسب مرتفعة، مما يمثل نقطة قوة، بينما تحتاج المحافظات الجنوبية إلى خطط لرفع كفاءة كوادرها.</p>
-                            <div style={{ height: 350 }} className="no-print">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={[...TEACHER_QUALIFICATIONS].sort((a,b) => b.value - a.value)} margin={{ top: 20, right: 20, left: -10, bottom: 5 }}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(200, 200, 200, 0.2)" />
-                                        <XAxis dataKey="name_ar" tick={{ fontSize: 12, fill: '#94a3b8' }} />
-                                        <YAxis unit="%" domain={[0, 'dataMax + 2']} tick={{ fontSize: 12, fill: '#cbd5e1' }} />
-                                        <Tooltip formatter={(value: number) => [`${value.toFixed(1)}%`, "النسبة"]} contentStyle={{ backgroundColor: 'rgba(17, 24, 39, 0.9)', borderColor: '#334155' }} />
-                                        <Bar dataKey="value" name="النسبة" fill="#22c55e" radius={[4, 4, 0, 0]}>
-                                            <LabelList dataKey="value" position="top" formatter={(value: number) => `${value.toFixed(1)}%`} style={{ fill: '#e2e8f0', fontSize: '12px' }}/>
-                                        </Bar>
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </div>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">3. جودة التعليم: الكثافة الصفية وكفاءة المعلمين</h2>
+                    <div className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
+                        <p className="mb-4">
+                            يُظهر مؤشر "نسبة الطلبة لكل معلم" تبايناً واضحاً في الجودة. فبينما تعاني <strong>الزرقاء</strong> من اكتظاظ واضح بنسبة تصل إلى <strong>20.5</strong> طالب لكل معلم في المدارس الحكومية، وعمان بنسبة 19.1، تتمتع محافظات الجنوب بنسب مريحة جداً (الطفيلة 10.6، الكرك 11.4)، مما يتيح فرصة أكبر للتركيز الفردي على الطلبة. ومع ذلك، فإن انخفاض النسبة في الجنوب قد يعكس أيضاً تشتت السكان وصغر حجم المدارس.
+                        </p>
+                        <p>
+                            من حيث المؤهلات، تتفوق محافظات الشمال، حيث تسجل <strong>جرش</strong> أعلى نسبة للمعلمين من حملة الشهادات العليا (<strong>9.7%</strong>)، تليها إربد (8.7%). في المقابل، تنخفض هذه النسبة بشكل ملحوظ في العقبة (2.6%) والطفيلة (2.9%)، مما يستدعي برامج ابتعاث وتحفيز لرفع كفاءة الكادر التعليمي في الجنوب.
+                        </p>
+                    </div>
+                    <div style={{ height: 350 }} className="no-print">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={[...STUDENT_TEACHER_RATIO_MOE].sort((a,b) => b.value - a.value)} margin={{ top: 20, right: 20, left: -10, bottom: 5 }}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(200, 200, 200, 0.2)" />
+                                <XAxis dataKey="name_ar" tick={{ fontSize: 12, fill: '#94a3b8' }} />
+                                <YAxis domain={[8, 'dataMax + 2']} tick={{ fontSize: 12, fill: '#cbd5e1' }}/>
+                                <Tooltip formatter={(value: number) => [value.toFixed(1), "طالب/معلم"]} />
+                                <Bar dataKey="value" name="النسبة" fill="#a855f7" radius={[4, 4, 0, 0]}>
+                                    <LabelList dataKey="value" position="top" style={{ fill: '#e2e8f0', fontSize: '12px' }} />
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
                     </div>
                 </Card>
 
                 <Card className="card-container">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">4. تحديات استراتيجية وتوصيات</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">4. التوصيات الاستراتيجية</h2>
                     <div className="text-gray-600 dark:text-gray-300 leading-relaxed space-y-4 text-lg">
-                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white pt-2">أبرز التحديات:</h3>
-                        <ul className="list-disc list-outside mr-6 space-y-2">
-                            <li><strong>الاكتظاظ الطلابي:</strong> الضغط الكبير على الموارد التعليمية في المحافظات ذات الكثافة السكانية العالية (العاصمة، الزرقاء، إربد) يؤدي إلى ارتفاع نسبة الطلبة للمعلمين والصفوف.</li>
-                            <li><strong>البنية التحتية غير المستدامة:</strong> الاعتماد الكبير على المباني المدرسية المستأجرة في العديد من المحافظات يشكل عبئاً مالياً ويحد من القدرة على تطوير البيئة المدرسية.</li>
-                            <li><strong>التفاوت في جودة الكوادر:</strong> تباين واضح في نسبة المعلمين من حملة الشهادات العليا بين المحافظات، مما يخلق فجوة في جودة المخرجات التعليمية المحتملة.</li>
-                            <li><strong>ضعف جاذبية التعليم المهني:</strong> على الرغم من أهميته لسوق العمل، لا يزال الإقبال على التعليم المهني، خاصة بين الإناث، دون المستوى المأمول.</li>
-                        </ul>
-                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white pt-4">توصيات استراتيجية:</h3>
                         <ul className="list-disc list-outside mr-6 space-y-2">
                             <li><strong>خطة وطنية للمباني المدرسية:</strong> إطلاق برنامج طويل الأمد للتخلص التدريجي من المدارس المستأجرة، مع إعطاء الأولوية للمحافظات ذات النسب الأعلى مثل الزرقاء وجرش.</li>
                             <li><strong>إعادة توزيع الكوادر التعليمية:</strong> وضع حوافز مادية ومعنوية للمعلمين (خاصة حملة الشهادات العليا) للعمل في المحافظات التي تعاني من نقص، مثل العقبة والطفيلة.</li>
-                            <li><strong>تطوير التعليم المهني:</strong> إطلاق حملة وطنية لتغيير الصورة النمطية عن التعليم المهني، وتحديث المسارات لتواكب متطلبات سوق العمل المستقبلية (مثل التكنولوجيا الخضراء والذكاء الاصطناعي)، وتقديم برامج موجهة لزيادة التحاق الإناث.</li>
-                            <li><strong>استخدام البيانات في التخطيط:</strong> تبني نهج قائم على البيانات في توزيع الموارد، بحيث يتم تخصيص الميزانيات والمشاريع بناءً على مؤشرات الأداء والفجوات التنموية لكل مديرية ومحافظة.</li>
+                            <li><strong>تطوير التعليم المهني:</strong> إطلاق حملة وطنية لتغيير الصورة النمطية عن التعليم المهني، وتحديث المسارات لتواكب متطلبات سوق العمل المستقبلية.</li>
+                            <li><strong>المدارس المجمعة:</strong> دمج المدارس الصغيرة والمستأجرة في مدارس مجمعة حديثة في مراكز الألوية مع توفير شبكة نقل فعالة.</li>
                         </ul>
                     </div>
                 </Card>

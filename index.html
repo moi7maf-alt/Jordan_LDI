@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>منظومة التحليل التنموي المعززة بالذكاء الاصطناعي لمحافظات المملكة الأर्डنية الهاشمية</title>
+    <title>منظومة التحليل التنموي المعززة بالذكاء الاصطناعي لمحافظات المملكة الأردنية الهاشمية</title>
     <script src="https://cdn.tailwindcss.com"></script>
   <script type="importmap">
 {
@@ -37,74 +37,106 @@
       z-index: 10;
     }
 
+    /* Print Styling for Text-Only Reports */
     @media print {
       @page {
         size: A4;
-        margin: 2cm 1.5cm; /* Top/Bottom 2cm, Left/Right 1.5cm */
+        margin: 2.5cm 2cm; /* Generous margins for readability */
       }
 
       body {
         background-color: white !important;
-        -webkit-print-color-adjust: exact; /* Ensures colors and backgrounds are printed */
-        print-color-adjust: exact;
+        color: #000 !important;
+        font-family: 'Times New Roman', 'Traditional Arabic', serif !important; /* Serif fonts are better for long print reading */
+        font-size: 14pt !important;
+        line-height: 1.6 !important;
       }
 
-      /* Hide non-essential elements */
-      aside, header, .no-print {
+      /* HIDE Visuals */
+      aside, header, .no-print, 
+      .recharts-wrapper, 
+      .icon-container, 
+      svg, 
+      button, 
+      select,
+      .kpi-card-visual, /* Class to hide KPI boxes in print */
+      iframe {
         display: none !important;
       }
       
       /* Reset layout for main content area to allow natural flow */
-      body, #root, #root > div {
+      body, #root, #root > div, main, .flex, .grid {
         display: block !important;
         height: auto !important;
+        width: 100% !important;
         overflow: visible !important;
+        position: static !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        float: none !important;
       }
 
-      main {
-        padding: 0 !important;
-        margin: 0 !important;
-        overflow: visible !important;
-        flex: none !important;
-        display: block !important;
-      }
-      
-      main > div:first-child {
-        padding: 0 !important;
-        overflow: visible !important;
-        height: auto !important;
-      }
-      
-      /* Styling for report content */
-      .card-container, #report-content, .report-page-content {
-        box-shadow: none !important;
-        border: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        background: transparent !important;
+      /* Headings */
+      h1 {
+        font-size: 24pt !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        border-bottom: 2px solid #000 !important;
+        margin-bottom: 30px !important;
+        padding-bottom: 10px !important;
+        color: #000 !important;
       }
 
-      /* Control page breaks: avoid breaking inside cards/charts, but allow the long AI report to break */
-      h1, h2, h3 {
+      h2 {
+        font-size: 18pt !important;
+        font-weight: bold !important;
+        border-bottom: 1px solid #ccc !important;
+        margin-top: 30px !important;
+        margin-bottom: 15px !important;
+        color: #000 !important;
         page-break-after: avoid;
       }
-      
-      .card-container {
-        page-break-inside: avoid;
+
+      h3 {
+        font-size: 16pt !important;
+        font-weight: bold !important;
+        margin-top: 20px !important;
+        margin-bottom: 10px !important;
+        color: #000 !important;
+        page-break-after: avoid;
       }
 
+      /* Text Content */
+      p, li {
+        font-size: 14pt !important;
+        text-align: justify !important;
+        margin-bottom: 12px !important;
+        color: #000 !important;
+      }
+
+      /* Lists */
+      ul {
+        margin-right: 20px !important;
+        list-style-type: disc !important;
+      }
+
+      /* Cards cleanup */
+      .card-container, div[class*="bg-"] {
+        box-shadow: none !important;
+        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 0 15px 0 !important;
+      }
+
+      /* Ensure page breaks are handled gracefully */
       .page-break {
         page-break-before: always;
       }
-
-      #ai-report-text-container {
-        page-break-inside: auto; /* IMPORTANT: Allows the long AI text block to break across pages */
-      }
-
-      /* Ensure charts are visible and scale properly */
-      svg, .recharts-wrapper {
-          width: 100% !important;
-          height: auto !important;
+      
+      /* Show elements specifically marked for print */
+      .print-only {
+        display: block !important;
       }
     }
 </style>
