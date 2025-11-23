@@ -71,7 +71,7 @@ const Dashboard: React.FC = () => {
                 <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
                 <div className="relative z-10 text-center">
                     <h1 className="text-3xl lg:text-5xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200">
-                        المنصة الرقمية للتحليل التنبؤي
+                        المنصة الرقمية للتحليل التنموي للمحافظات الأردنية
                     </h1>
                     <p className="text-lg lg:text-xl text-slate-300 font-light">
                         رؤية تنموية مستدامة مدعومة بقوة <span className="font-bold text-amber-400">البيانات</span> و <span className="font-bold text-emerald-400">الذكاء الاصطناعي</span>
