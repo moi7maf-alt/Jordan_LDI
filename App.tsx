@@ -18,6 +18,7 @@ import PredictiveAnalysis from './components/PredictiveAnalysis';
 import Header from './components/Header';
 import DataSources from './components/DataSources';
 import SocialDevelopment from './components/SocialDevelopment';
+import Priorities from './components/Priorities';
 import { View } from './types';
 
 const App: React.FC = () => {
@@ -58,6 +59,8 @@ const App: React.FC = () => {
         return <PredictiveAnalysis />;
       case 'data_sources':
         return <DataSources />;
+      case 'priorities':
+        return <Priorities />;
       default:
         return <Dashboard />;
     }

@@ -15,8 +15,6 @@ import { GOVERNORATES_DATA } from '../constants';
 import LivestockTrendChart from './charts/LivestockTrendChart';
 import LivestockCompositionChart from './charts/LivestockCompositionChart';
 
-type ContentBlock = { type: 'h1' | 'h2' | 'h3' | 'p'; text: string; };
-
 const KpiCard: React.FC<{ title: string; value: string; unit: string; icon: string; bgColor: string; textColor: string; }> = ({ title, value, unit, icon, bgColor, textColor }) => (
     <div className={`p-4 rounded-xl text-center shadow-sm ${bgColor} break-inside-avoid card-container kpi-card-visual`}>
         <div className="text-3xl mb-2 icon-container">{icon}</div>
@@ -25,16 +23,15 @@ const KpiCard: React.FC<{ title: string; value: string; unit: string; icon: stri
     </div>
 );
 
-
 const AgriculturalDevelopment: React.FC = () => {
-    // State for Plant Wealth section
+    // State for Charts
     const [selectedPlantGov, setSelectedPlantGov] = useState('Amman');
+    const [selectedLivestockGov, setSelectedLivestockGov] = useState('Amman');
     const [isExportingDocx, setIsExportingDocx] = useState(false);
 
-    // State for Livestock Wealth section
-    const [selectedLivestockGov, setSelectedLivestockGov] = useState('Amman');
+    // --- Memos & Data Processing ---
 
-    // Memos for Plant Wealth
+    // Plant Data Processing
     const latestPlantData = useMemo(() => {
         return AGRICULTURE_DATA.map(gov => {
             const lastEntry = gov.data[gov.data.length - 1];
@@ -42,8 +39,9 @@ const AgriculturalDevelopment: React.FC = () => {
                 name_ar: gov.name_ar,
                 name: gov.name,
                 ...lastEntry,
+                total_area: lastEntry.fieldCrops + lastEntry.fruitTrees
             };
-        }).sort((a,b) => (b.fieldCrops + b.fruitTrees) - (a.fieldCrops + a.fruitTrees));
+        }).sort((a,b) => b.total_area - a.total_area);
     }, []);
     
     const latestPlantTotals = useMemo(() => {
@@ -56,7 +54,7 @@ const AgriculturalDevelopment: React.FC = () => {
 
     const selectedPlantGovData = AGRICULTURE_DATA.find(g => g.name === selectedPlantGov)?.data;
 
-    // Memos for Livestock Wealth
+    // Livestock Data Processing
     const latestLivestockData = useMemo(() => {
         return LIVESTOCK_DATA.map(gov => {
             const lastEntry = gov.data[gov.data.length - 1];
@@ -72,33 +70,51 @@ const AgriculturalDevelopment: React.FC = () => {
     const latestLivestockTotals = KINGDOM_LIVESTOCK_TOTALS.data[KINGDOM_LIVESTOCK_TOTALS.data.length - 1];
     const selectedLivestockGovData = LIVESTOCK_DATA.find(g => g.name === selectedLivestockGov)?.data;
 
-     const generateReportContent = (): ContentBlock[] => [
-        { type: 'h1', text: "التقرير الاستراتيجي: القطاع الزراعي والأمن الغذائي 2024" },
-        
-        { type: 'h2', text: "1. مقدمة: الزراعة في مواجهة ندرة المياه" },
-        { type: 'p', text: "في ظل التحديات العالمية المتزايدة، أصبح تعزيز الأمن الغذائي والاكتفاء الذاتي أولوية استراتيجية قصوى. يمثل القطاع الزراعي في الأردن، بشقيه النباتي والحيواني، حجر الزاوية في هذه المعادلة. يواجه القطاع تحدياً وجودياً يتمثل في شح المياه، حيث تستقبل 90% من أراضي المملكة أقل من 150 ملم من الأمطار سنوياً. رغم ذلك، أظهر القطاع مرونة عالية عبر تبني التكنولوجيا الحديثة، حيث بلغت المساحة المزروعة بالمحاصيل الحقلية حوالي ${(latestPlantTotals.fieldCrops / 1000).toFixed(1)} ألف دونم، والأشجار المثمرة ${(latestPlantTotals.fruitTrees / 1000).toFixed(1)} ألف دونم." },
-        
-        { type: 'h2', text: "2. الثروة النباتية: خارطة الإنتاج والتخصص" },
-        { type: 'p', text: "تُظهر البيانات تخصصاً جغرافياً واضحاً في الإنتاج النباتي. تتربع محافظة المفرق على عرش زراعة الأشجار المثمرة بمساحات شاسعة، مستفيدة من طبيعة أراضيها السهلية وتوفر المياه الجوفية، مما يجعلها المصدر الرئيسي للفواكه والزيتون. في المقابل، تتصدر إربد والعاصمة إنتاج المحاصيل الحقلية (القمح والشعير)، معتمدة بشكل أساسي على الزراعة البعلية. هذا التنوع الجغرافي يعزز التكامل الغذائي، لكنه يتطلب سياسات دعم متباينة تراعي خصوصية كل منطقة (دعم مياه للمفرق، ودعم بذار لإربد)." },
+    // --- Narrative Content Generation (Unified Framework) ---
 
-        { type: 'h2', text: "3. الثروة الحيوانية: أرقام النمو وتحديات الأعلاف" },
-        { type: 'p', text: `شهد قطاع الثروة الحيوانية نمواً ملحوظاً، حيث وصل إجمالي عدد الضأن إلى ${latestLivestockTotals.sheep.toLocaleString()} رأس، والماعز إلى ${latestLivestockTotals.goats.toLocaleString()} رأس. تتصدر محافظة المفرق أعداد الثروة الحيوانية بفارق كبير (حوالي مليون رأس من الضأن)، تليها العاصمة والكرك. هذا التركز في المفرق يجعلها "خزان اللحوم الحمراء" للمملكة، لكنه يضع ضغطاً بيئياً على المراعي ويتطلب توفير كميات ضخمة من الأعلاف المستوردة، مما يربط الأمن الغذائي بتقلبات الأسعار العالمية.` },
-
-        { type: 'h2', text: "4. قطاعات داعمة: الدواجن والاستزراع السمكي" },
-        { type: 'p', text: "حقق قطاع الدواجن مستويات اكتفاء ذاتي ممتازة، حيث بلغ إنتاج لحوم الدواجن 365.8 ألف طن وبيض المائدة حوالي 1.3 مليار بيضة. في المقابل، لا يزال قطاع الأسماك دون الطموح، بفجوة كبيرة بين الإنتاج المحلي (4,251 طن) والاستهلاك (33,647 طن)، مما يفتح باباً واسعاً للاستثمار في مشاريع الاستزراع المائي، خاصة في وادي الأردن والعقبة." },
-
-        { type: 'h2', text: "5. التوصيات الاستراتيجية" },
-        { type: 'p', text: "أولاً: التحول الجذري نحو الزراعة الذكية مناخياً (Hydroponics) لرفع كفاءة استخدام المياه." },
-        { type: 'p', text: "ثانياً: إنشاء مصانع للأعلاف تعتمد على مدخلات محلية لتقليل فاتورة الاستيراد ودعم مربي الماشية في المفرق والجنوب." },
-        { type: 'p', text: "ثالثاً: تشجيع التصنيع الغذائي (تجفيف، تعليب) في مناطق الإنتاج لتقليل الفاقد ما بعد الحصاد وزيادة القيمة المضافة للمنتج المحلي." },
+    const reportContent = [
+        {
+            title: "1. الملخص التنفيذي والأثر الاستراتيجي",
+            content: `يحتل القطاع الزراعي مكانة محورية في منظومة الأمن الغذائي والاقتصاد الوطني. رغم مساهمته المتواضعة في الناتج المحلي الإجمالي المباشر، إلا أن أثره الاستراتيجي يمتد ليشمل الأمن الغذائي، والاستقرار الاجتماعي في الأرياف، وتشغيل القوى العاملة. تظهر بيانات عام 2023 استقراراً في المساحات المزروعة بالأشجار المثمرة (${(latestPlantTotals.fruitTrees / 1000).toFixed(1)} ألف دونم) ونمواً في أعداد الثروة الحيوانية (خاصة الضأن الذي وصل إلى 3.4 مليون رأس). ومع ذلك، يواجه القطاع تحديات هيكلية تتمثل في ندرة المياه، والتغير المناخي، وتركز الإنتاج في مناطق محددة (المفرق للزراعة، والضأن)، مما يجعله عرضة للصدمات البيئية والاقتصادية.`
+        },
+        {
+            title: "2. الإطار العام للقطاع والمشهد الديموغرافي",
+            content: `يرتبط النشاط الزراعي ارتباطاً وثيقاً بالجغرافيا والديموغرافيا. تتركز الزراعة المروية المكثفة (خاصة الأشجار المثمرة) في محافظة المفرق التي تضم وحدها 242 ألف دونم من الأشجار المثمرة، مستفيدة من المياه الجوفية والمساحات الشاسعة. في المقابل، تعتمد محافظات إربد وعمان على الزراعة المطرية (المحاصيل الحقلية) التي ترتبط بالمواسم وتوفر دخلاً موسمياً للأسر الريفية. ديموغرافياً، يُعد القطاع مشغلاً رئيسياً للعمالة في الأطراف، خاصة العمالة الوافدة والنساء العاملات في قطاع الزراعة غير المنظم، مما يجعله ركيزة للحماية الاجتماعية في المناطق الأقل حظاً.`
+        },
+        {
+            title: "3. تحليل الأداء التنموي والمؤشرات الرئيسية (KPIs)",
+            content: `**الثروة النباتية:** تتصدر محافظة العاصمة إنتاج المحاصيل الحقلية (164,749 دونم)، مما يعكس استغلالاً جيداً للأراضي في جنوب وشرق عمان. بينما تهيمن المفرق على قطاع الأشجار المثمرة. التذبذب في مساحات المحاصيل الحقلية في المفرق (انخفاض ثم ارتفاع) يشير إلى مخاطر الاعتماد على الزراعة البعلية.\n**الثروة الحيوانية:** شهد قطاع الضأن طفرة في المفرق ليصل إلى قرابة مليون رأس، مما يجعلها "خزان اللحوم الحمراء" للمملكة. كما لوحظ نمو كبير في أعداد الماعز في العقبة ومعان، مما يعكس تكيف المجتمعات المحلية مع البيئة الجافة. أما قطاع الأبقار، فيتركز بشكل مكثف في الزرقاء (40,010 رأس) وإربد، بينما يغيب بشكل شبه كامل عن محافظات الجنوب، مما يخلق فجوة في إنتاج الحليب الطازج.`
+        },
+        {
+            title: "4. دراسة الأبعاد التنموية وكفاءة الموارد",
+            content: `كفاءة استخدام الموارد المائية هي التحدي الأكبر. تركز الزراعة المروية في المفرق (التي تعتمد على المياه الجوفية غير المتجددة) يطرح تساؤلات حول الاستدامة طويلة الأمد. في المقابل، يعتبر التوسع في زراعة الزيتون في جرش وعجلون (زراعة بعلية) نموذجاً أكثر استدامة وكفاءة. اقتصادياً، يعاني صغار المزارعين من ضعف حلقات التسويق وارتفاع كلف المدخلات (أعلاف، أسمدة)، مما يقلل من هوامش الربح ويدفع البعض لهجر الأراضي الزراعية. القيمة المضافة للقطاع لا تزال منخفضة بسبب ضعف التصنيع الغذائي الذي يمتص فائض الإنتاج.`
+        },
+        {
+            title: "5. تحليل الفجوات والمخاطر والبيئة التنافسية",
+            content: `**فجوة الأمن الغذائي:** الاعتماد الكبير على استيراد الحبوب والأعلاف يجعل القطاع مكشوفاً لتقلبات الأسعار العالمية.\n**الفجوة المناطقية:** تركز الثروة الحيوانية (الضأن) في المفرق (30% من المجموع) يجعل أي وباء حيواني هناك كارثة وطنية. كما أن غياب مزارع الأبقار في الجنوب يرفع كلفة منتجات الألبان هناك.\n**المخاطر:** التغير المناخي وتذبذب الهطول المطري يهدد الزراعات البعلية في إربد والكرك. كما أن الزحف العمراني على الأراضي الخصبة في عمان وإربد يقلص الرقعة الزراعية بشكل لا رجعة فيه.`
+        },
+        {
+            title: "6. الأولويات والتوجهات الاستراتيجية للقطاع",
+            content: `تتركز الأولويات في:\n1. **الزراعة الذكية مناخياً:** التوسع في استخدام أصناف بذور مقاومة للجفاف وتقنيات الري الموفرة للمياه.\n2. **سلاسل القيمة:** تحويل الزراعة من "إنتاج خام" إلى "تصنيع غذائي" (رب البندورة، المخللات، الأجبان) لزيادة القيمة المضافة وتشغيل العمالة المحلية.\n3. **تنويع مصادر المياه:** التوسع في استخدام المياه المعالجة لزراعة الأعلاف في المناطق المحاذية لمحطات التنقية، لتخفيف الضغط على المياه الجوفية.`
+        },
+        {
+            title: "7. التوصيات التخطيطية ومتطلبات التنفيذ",
+            content: `لتعزيز صمود ونمو القطاع، يوصى بتبني التوصيات التالية:
+* **صندوق المخاطر السيادي للمفرق:** نظراً للأهمية الاستراتيجية للمفرق في الأمن الغذائي (نباتي وحيواني)، يجب إنشاء صندوق طوارئ خاص بالأوبئة والجفاف لهذه المحافظة حصراً.
+* **توطين الاستثمار في الجنوب:** تقديم أراضي وحوافز طاقة مدعومة لإنشاء مزارع أبقار ومصانع ألبان في الكرك ومعان لسد الفجوة الغذائية وتقليل كلف النقل من الشمال.
+* **قاعدة البيانات الزراعية الوطنية:** إنشاء نظام تتبع إلكتروني آني (Real-time) للمنتجات الزراعية لربط الإنتاج بالاستهلاك وتوجيه المزارعين نحو الزراعات المطلوبة، للحد من الاختناقات التسويقية.
+* **حماية الرقعة الزراعية:** تفعيل قوانين صارمة (Zero Tolerance) لمنع تفتيت الملكية والزحف العمراني في سهول حوران (إربد) ومأدبا، واعتبارها مناطق محمية استراتيجياً.
+* **التحول نحو الزراعة المائية (Hydroponics):** دعم قروض بدون فوائد للمزارعين في وادي الأردن والمناطق الصحراوية لتبني تقنيات الزراعة المائية التي توفر 80% من المياه.
+* **التصنيع الغذائي التعاوني:** دعم إنشاء جمعيات تعاونية في عجلون وجرش لإنشاء وحدات تصنيع غذائي (زيت زيتون، منتجات ألبان) لزيادة القيمة المضافة للمنتج المحلي.`
+        }
     ];
 
+    // --- Export Logic ---
 
     const handleExportDocx = async () => {
         setIsExportingDocx(true);
         try {
-            const content = generateReportContent();
-            const title = content[0].text;
+            const title = "التقرير القطاعي الشامل: الزراعة 2024";
 
             const docStyles: IStylesOptions = {
                 default: { document: { run: { font: "Arial", size: 24, rightToLeft: true } } },
@@ -106,23 +122,20 @@ const AgriculturalDevelopment: React.FC = () => {
                     { id: "Normal", name: "Normal", run: { size: 24 }, paragraph: { spacing: { after: 120 }, alignment: AlignmentType.RIGHT } },
                     { id: "h1", name: "h1", run: { size: 32, bold: true, color: "2E74B5" }, paragraph: { alignment: AlignmentType.CENTER, spacing: { before: 240, after: 120 } } },
                     { id: "h2", name: "h2", run: { size: 28, bold: true, color: "4F81BD" }, paragraph: { spacing: { before: 240, after: 120 }, alignment: AlignmentType.RIGHT } },
-                    { id: "h3", name: "h3", run: { size: 26, bold: true, color: "548DD4" }, paragraph: { spacing: { before: 180, after: 100 }, alignment: AlignmentType.RIGHT } },
                 ],
             };
 
-            const paragraphs = content.map(block => {
-                let style = block.type.startsWith('h') ? block.type : 'Normal';
-                return new Paragraph({
-                    children: [new TextRun(block.text)],
-                    style: style,
-                    bidirectional: true,
-                    alignment: (block.type === 'h1') ? AlignmentType.CENTER : AlignmentType.RIGHT,
-                });
-            });
+            const children = [
+                new Paragraph({ text: title, style: "h1" }),
+                ...reportContent.flatMap(section => [
+                    new Paragraph({ text: section.title, style: "h2" }),
+                    new Paragraph({ text: section.content, style: "Normal" })
+                ])
+            ];
 
             const doc = new Document({
                 styles: docStyles,
-                sections: [{ properties: { page: { margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 } } }, children: paragraphs }],
+                sections: [{ properties: { page: { margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 } } }, children }],
             });
 
             const blob = await Packer.toBlob(doc);
@@ -153,24 +166,14 @@ const AgriculturalDevelopment: React.FC = () => {
                         padding: 40px;
                         background: white !important;
                         color: black !important;
-                        font-size: 16pt;
+                        font-size: 14pt;
                         line-height: 1.6;
                     }
                     .no-print, .recharts-wrapper, button, select, svg, .icon-container, .kpi-card-visual { display: none !important; }
-                    
-                    .card-container {
-                        box-shadow: none !important;
-                        border: none !important;
-                        padding: 0 !important;
-                        margin-bottom: 20px !important;
-                        break-inside: avoid;
-                    }
-                    
-                    h1 { font-size: 28pt; font-weight: bold; text-align: center; border-bottom: 3px solid #000; margin-bottom: 30px; padding-bottom: 10px; }
-                    h2 { font-size: 22pt; font-weight: bold; border-bottom: 1px solid #666; margin-top: 30px; margin-bottom: 15px; }
-                    h3 { font-size: 18pt; font-weight: bold; margin-top: 20px; }
+                    .card-container { box-shadow: none !important; border: none !important; padding: 0 !important; margin-bottom: 20px !important; }
+                    h1 { font-size: 24pt; font-weight: bold; text-align: center; border-bottom: 3px solid #000; margin-bottom: 30px; padding-bottom: 10px; }
+                    h2 { font-size: 18pt; font-weight: bold; border-bottom: 1px solid #666; margin-top: 30px; margin-bottom: 15px; }
                     p, li { text-align: justify; margin-bottom: 12px; }
-                    
                     @page { size: A4; margin: 2.5cm; }
                 </style>
             </head>
@@ -181,10 +184,13 @@ const AgriculturalDevelopment: React.FC = () => {
                 ${headContent}
                 <body>
                     <div class="report-header">
-                        <h1>التقرير الاستراتيجي: القطاع الزراعي والأمن الغذائي</h1>
+                        <h1>التقرير القطاعي الشامل: الزراعة والأمن الغذائي 2024</h1>
                     </div>
                     <div class="content">
-                        ${reportElement.innerHTML}
+                        ${reportContent.map(section => `
+                            <h2>${section.title}</h2>
+                            <p>${section.content.replace(/\n/g, '<br/>')}</p>
+                        `).join('')}
                     </div>
                      <div class="report-footer" style="text-align: center; margin-top: 50px; font-size: 12pt; color: #666; border-top: 1px solid #ccc; padding-top: 10px;">
                         وزارة الداخلية - مديرية التنمية المحلية | منظومة التحليل الرقمي
@@ -221,80 +227,62 @@ const AgriculturalDevelopment: React.FC = () => {
             
             <div id="report-content" className="space-y-8">
                 <header className="text-center border-b border-gray-200 dark:border-gray-700 pb-8 no-print">
-                    <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">تحليلات القطاع الزراعي</h1>
-                    <p className="text-lg text-gray-500 dark:text-gray-400 mt-1">تحليل استراتيجي للثروة النباتية والحيوانية والأمن الغذائي.</p>
+                    <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">التقرير الاستراتيجي للقطاع الزراعي</h1>
+                    <p className="text-lg text-gray-500 dark:text-gray-400 mt-1">تحليل معمق للثروة النباتية والحيوانية وتحديات الأمن الغذائي (2024).</p>
                 </header>
 
-                <Card className="card-container">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">1. الزراعة في مواجهة ندرة المياه: الواقع والتحديات</h2>
-                    <div className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
-                        <p>
-                            يشكل القطاع الزراعي صمام الأمان الغذائي للأردن، لكنه يواجه تحدياً وجودياً يتمثل في شح المياه، حيث تستقبل 90% من أراضي المملكة أقل من 150 ملم من الأمطار سنوياً. رغم ذلك، أظهر القطاع مرونة عالية عبر تبني التكنولوجيا الحديثة. تشير البيانات إلى أن إجمالي المساحة المزروعة بالمحاصيل الحقلية بلغت حوالي <strong>{(latestPlantTotals.fieldCrops / 1000).toFixed(1)} ألف دونم</strong>، بينما غطت الأشجار المثمرة <strong>{(latestPlantTotals.fruitTrees / 1000).toFixed(1)} ألف دونم</strong>.
-                        </p>
-                        <p className="mt-4">
-                            تُظهر البيانات تخصصاً جغرافياً واضحاً؛ إذ تتربع <strong>محافظة المفرق</strong> على عرش زراعة الأشجار المثمرة بمساحات شاسعة، مستفيدة من طبيعة أراضيها وتوفر المياه الجوفية، بينما تتصدر <strong>إربد والعاصمة</strong> إنتاج المحاصيل الحقلية (القمح والشعير) اعتماداً على الزراعة البعلية.
-                        </p>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6 no-print">
-                         <div>
-                             <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-lg font-semibold text-gray-800">المساحات المزروعة (2023)</h3>
-                                <select
-                                    value={selectedPlantGov}
-                                    onChange={(e) => setSelectedPlantGov(e.target.value)}
-                                    className="bg-gray-100 border border-gray-300 rounded-md p-2 text-sm"
-                                >
-                                    {AGRICULTURE_DATA.map(g => <option key={g.name} value={g.name}>{g.name_ar}</option>)}
-                                </select>
+                {reportContent.map((section, idx) => (
+                    <Card key={idx} className="card-container">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{section.title}</h2>
+                        <div className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg whitespace-pre-line">
+                            {section.content.split('\n').map((line, i) => {
+                                const parts = line.split(/(\*\*.*?\*\*)/g);
+                                return (
+                                    <p key={i} className="mb-3">
+                                        {parts.map((part, j) => 
+                                            part.startsWith('**') && part.endsWith('**') 
+                                                ? <strong key={j} className="font-bold text-gray-900 dark:text-white">{part.slice(2, -2)}</strong> 
+                                                : part
+                                        )}
+                                    </p>
+                                );
+                            })}
+                        </div>
+                        {idx === 0 && (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 kpi-card-visual mt-6">
+                                <KpiCard title="إجمالي الضأن (2023)" value={latestLivestockTotals.sheep.toLocaleString()} unit="رأس" icon="🐑" bgColor="bg-yellow-50" textColor="text-yellow-600" />
+                                <KpiCard title="إجمالي المحاصيل الحقلية" value={(latestPlantTotals.fieldCrops / 1000).toFixed(1)} unit="ألف دونم" icon="🌾" bgColor="bg-emerald-50" textColor="text-emerald-600" />
+                                <KpiCard title="إجمالي الأبقار (2023)" value={latestLivestockTotals.cows.toLocaleString()} unit="رأس" icon="🐄" bgColor="bg-blue-50" textColor="text-blue-600" />
                             </div>
-                            {selectedPlantGovData && <AgricultureTrendChart data={selectedPlantGovData} />}
-                        </div>
-                    </div>
-                </Card>
-
-                <Card className="card-container">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">2. الثروة الحيوانية: خزان الغذاء الاستراتيجي</h2>
-                    <div className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
-                        <p>
-                            شهد قطاع الثروة الحيوانية نمواً ملحوظاً، حيث وصل إجمالي عدد الضأن إلى <strong>{latestLivestockTotals.sheep.toLocaleString()}</strong> رأس، والماعز إلى <strong>{latestLivestockTotals.goats.toLocaleString()}</strong> رأس. تتصدر <strong>محافظة المفرق</strong> أعداد الثروة الحيوانية بفارق كبير (حوالي مليون رأس من الضأن)، تليها العاصمة والكرك. هذا التركز في المفرق يجعلها "خزان اللحوم الحمراء" للمملكة، لكنه يضع ضغطاً بيئياً على المراعي ويتطلب توفير كميات ضخمة من الأعلاف المستوردة، مما يربط الأمن الغذائي بتقلبات الأسعار العالمية.
-                        </p>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8 kpi-card-visual">
-                        <KpiCard title="إجمالي الضأن (2023)" value={latestLivestockTotals.sheep.toLocaleString()} unit="رأس" icon="🐑" bgColor="bg-yellow-50" textColor="text-yellow-600" />
-                        <KpiCard title="إجمالي الماعز (2023)" value={latestLivestockTotals.goats.toLocaleString()} unit="رأس" icon="🐐" bgColor="bg-orange-50" textColor="text-orange-600" />
-                        <KpiCard title="إجمالي الأبقار (2023)" value={latestLivestockTotals.cows.toLocaleString()} unit="رأس" icon="🐄" bgColor="bg-blue-50" textColor="text-blue-600" />
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 no-print">
-                         <div>
-                             <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-lg font-semibold text-gray-800">تطور أعداد الثروة الحيوانية</h3>
-                                <select
-                                    value={selectedLivestockGov}
-                                    onChange={(e) => setSelectedLivestockGov(e.target.value)}
-                                    className="bg-gray-100 border border-gray-300 rounded-md p-2 text-sm"
-                                >
-                                    {LIVESTOCK_DATA.map(g => <option key={g.name} value={g.name}>{g.name_ar}</option>)}
-                                </select>
+                        )}
+                        {idx === 2 && (
+                            <div className="mt-8 no-print">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                    <div>
+                                        <h4 className="text-md font-semibold text-center mb-2">المساحات المزروعة حسب المحافظة (2023)</h4>
+                                        <div style={{ width: '100%', height: 350 }}>
+                                            <ResponsiveContainer>
+                                                <BarChart data={latestPlantData} margin={{ top: 20, right: 5, left: 5, bottom: 5 }}>
+                                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(128, 128, 128, 0.2)" />
+                                                    <XAxis dataKey="name_ar" tick={{ fontSize: 11, fill: '#333333' }} interval={0} />
+                                                    <YAxis tickFormatter={(value) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value)} tick={{ fontSize: 11, fill: '#333333' }} />
+                                                    <Tooltip contentStyle={{ backgroundColor: 'rgba(31, 41, 55, 0.8)', borderRadius: '0.5rem', color: '#fff' }} />
+                                                    <Legend />
+                                                    <Bar dataKey="fieldCrops" name="محاصيل حقلية" stackId="a" fill="#10b981" />
+                                                    <Bar dataKey="fruitTrees" name="أشجار مثمرة" stackId="a" fill="#f59e0b" />
+                                                </BarChart>
+                                            </ResponsiveContainer>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-md font-semibold text-center mb-2">توزيع الثروة الحيوانية حسب المحافظة (2023)</h4>
+                                        <LivestockCompositionChart data={latestLivestockData} />
+                                    </div>
+                                </div>
                             </div>
-                            {selectedLivestockGovData && <LivestockTrendChart data={selectedLivestockGovData} />}
-                        </div>
-                        <div>
-                             <h3 className="text-lg font-semibold text-gray-800 mb-4">التركيب النسبي للثروة الحيوانية (2023)</h3>
-                             <LivestockCompositionChart data={latestLivestockData} />
-                        </div>
-                    </div>
-                </Card>
-
-                <Card className="card-container">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">3. توصيات استراتيجية</h2>
-                    <div className="text-gray-700 dark:text-gray-300 text-lg space-y-4">
-                        <p><strong>تعزيز كفاءة استخدام المياه:</strong> التوسع في تقنيات الري الذكي والزراعة المائية (Hydroponics) لزيادة الإنتاجية لكل متر مكعب من المياه.</p>
-                        <p><strong>دعم صغار المزارعين:</strong> توفير قروض ميسرة وبرامج إرشاد زراعي لتمكين صغار المزارعين من تبني تكنولوجيات حديثة وتحسين جودة منتجاتهم.</p>
-                        <p><strong>التصنيع الغذائي:</strong> تشجيع الاستثمار في الصناعات الغذائية التي تعتمد على المنتجات المحلية (مثل الألبان، زيت الزيتون، تجفيف الفواكه) لزيادة القيمة المضافة وخلق فرص عمل.</p>
-                    </div>
-                </Card>
+                        )}
+                    </Card>
+                ))}
             </div>
         </div>
     );

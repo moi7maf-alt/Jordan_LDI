@@ -10,8 +10,6 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { Document, Packer, Paragraph, TextRun, AlignmentType, IStylesOptions } from 'docx';
 import saveAs from 'file-saver';
 
-type ContentBlock = { type: 'h1' | 'h2' | 'h3' | 'p' | 'list-item'; text: string; };
-
 const Water: React.FC = () => {
     const [isExportingDocx, setIsExportingDocx] = useState(false);
     const [selectedGov, setSelectedGov] = useState('Amman');
@@ -27,29 +25,45 @@ const Water: React.FC = () => {
 
     const reportContent = [
         {
-            title: "1. الأمن المائي: الواقع الاستراتيجي والتحديات الهيكلية",
-            content: `يواجه الأردن أزمة مائية وجودية تتجاوز مفهوم "الشح" لتصل إلى العجز الهيكلي المزمن. تشير البيانات الرقمية لعام 2024 إلى انخفاض حصة الفرد من المياه في العديد من المحافظات عن خط الفقر المائي المدقع (أقل من 100 متر مكعب سنوياً). في محافظة إربد، انخفضت حصة الفرد إلى 77.6 م³ سنوياً، وفي جرش إلى 84.3 م³، مما يضع هذه المحافظات تحت ضغط ديموغرافي ومائي هائل، فاقمه اللجوء السوري والتغير المناخي الذي أدى لتراجع الهطول المطري بنسبة تتجاوز 20% عن المعدل العام طويل الأمد.
-            
-            هذا العجز دفع الدولة والمواطن نحو حلول مكلفة وغير مستدامة. الاعتماد على المياه الجوفية تجاوز الحدود الآمنة للسحب (Safe Yield) بأضعاف في أحواض رئيسية كالأزرق واليرموك، مما ينذر بملوحة المياه ونضوب الطبقات الجوفية الاستراتيجية.`
+            title: "1. الملخص التنفيذي والأثر الاستراتيجي",
+            content: `يواجه الأردن تحدياً وجودياً يتمثل في العجز المائي الهيكلي، حيث تصنف المملكة كواحدة من أفقر دول العالم مائياً. إلا أن قراءة بيانات عام 2024 تذهب إلى ما هو أعمق من مجرد "شح الموارد"؛ فهي تكشف عن "أزمة إدارة وتوزيع" حادة تخلق تفاوتات تنموية واجتماعية خطيرة بين المحافظات. تظهر المؤشرات فجوة صارخة بين "المراكز الحضرية" التي تتمتع باستقرار مائي نسبي (مثل العقبة وعمان)، وبين "محافظات الأطراف" (مثل جرش والمفرق والكرك) التي تعيش واقعاً مائياً صعباً يعتمد فيه المواطن على الحلول الفردية المكلفة (الصهاريج). هذا الواقع يفرض كلفاً اقتصادية باهظة على الأسر الأردنية، ويستنزف المياه الجوفية، ويشكل تهديداً بيئياً عبر الصرف الصحي غير المعالج. الأمن المائي لم يعد مجرد قضية خدماتية، بل أصبح ركيزة أساسية للأمن القومي والاستقرار الاجتماعي.`
         },
         {
-            title: "2. اقتصاد الصهاريج: الخصخصة القسرية للمياه",
-            content: `يكشف تحليل مصادر مياه الشرب عن تحول خطير في نمط التزود بالمياه، حيث باتت "الصهاريج" المصدر الرئيسي للمياه في محافظات حيوية، متجاوزة الشبكة العامة. في جرش، يعتمد 73.8% من الأسر على الصهاريج، وفي مأدبا 71.8%، وفي الكرك 71.3%. هذا الاعتماد المرتفع يشير إلى فشل في كفاءة الشبكة العامة وعدم انتظام أدوار المياه.
-            
-            هذا التحول خلق ما يمكن تسميته "اقتصاد الصهاريج"، حيث تتحمل الأسر كلفة إضافية باهظة للحصول على المياه (سعر المتر المكعب من الصهريج قد يصل لـ 5 أضعاف سعره من الشبكة)، مما يفاقم الفجوة الاجتماعية ويستنزف دخل الأسر، خاصة في المحافظات ذات الدخل المحدود.`
+            title: "2. الإطار العام للقطاع والمشهد الديموغرافي",
+            content: `يتأثر القطاع المائي بشكل مباشر بالنمو السكاني وتوزيع الكثافة. الضغط الديموغرافي في "إقليم الشمال" (إربد، المفرق) نتيجة اللجوء السوري شكل صدمة للبنية التحتية المائية، حيث انخفضت حصة الفرد إلى مستويات حرجة. في المقابل، يشهد الجنوب ضغطاً من نوع آخر يتعلق بالزراعة والتعدين. التحليل الديموغرافي يظهر أن الأسر في المناطق ذات الكثافة العالية والنمو العشوائي (أطراف المدن) هي الأكثر تضرراً من انقطاع المياه، مما يضطرها لإنفاق جزء كبير من دخلها على شراء المياه. هذا الارتباط بين "الفقر المائي" و"الفقر الاقتصادي" يتطلب معالجة شمولية تدمج التخطيط العمراني مع التخطيط المائي.`
         },
         {
-            title: "3. تحدي الصرف الصحي والبعد البيئي",
-            content: `تظهر البيانات تبايناً صارخاً في خدمات الصرف الصحي يعكس غياب العدالة في توزيع مشاريع البنية التحتية. بينما تتمتع العقبة بنسبة تغطية شبكة عامة تصل إلى 87.4% والزرقاء 82.8%، تعاني محافظات ذات طبيعة جيولوجية حساسة من غياب شبه كامل للشبكة. في الكرك، تعتمد 83.6% من الأسر على الحفر الامتصاصية، وفي المفرق 85.0%.
-            
-            هذا الاعتماد الهائل على الحفر الامتصاصية يشكل "قنبلة بيئية موقوتة"، خاصة في المناطق التي تعتمد على المياه الجوفية للشرب والزراعة، حيث يرتفع خطر تلوث الأحواض الجوفية بالنترات والملوثات البيولوجية، مما يهدد الأمن الصحي والغذائي على المدى الطويل.`
+            title: "3. تحليل الأداء التنموي والمؤشرات الرئيسية (KPIs)",
+            content: `يكشف تحليل بيانات مصادر مياه الشرب عن تحول هيكلي في نمط التزود. تراجعت ثقة المواطن بالشبكة العامة في العديد من المحافظات، ليحل محلها "اقتصاد الصهاريج". في **جرش**، يعتمد 73.8% من الأسر على الصهاريج، وفي **مأدبا** 71.8%، وهي نسب تعني فشلاً وظيفياً للشبكة العامة في تلبية الطلب اليومي. على النقيض، تحافظ **الزرقاء** على أعلى نسبة اعتماد على الشبكة (43.4%)، تليها عمان (31.5%). مؤشر آخر مقلق هو الاعتماد المفرط على المياه المعبأة في **العقبة** (81.8%)، رغم توفر الشبكة، مما يشير لتحديات تتعلق بجودة المياه أو أنماط الاستهلاك. هذه المؤشرات تؤكد أن "الوصول للمياه" لا يعني بالضرورة "الأمن المائي" للأسر.`
+        },
+        {
+            title: "4. دراسة الأبعاد التنموية وكفاءة الموارد",
+            content: `عند تتبع حصة الفرد من التزود المائي، نلاحظ استنزافاً واضحاً في الشمال، حيث حافظت **إربد** على أدنى حصة للفرد (77.6 متر مكعب)، وهو رقم يقل عن خط الفقر المائي العالمي بكثير. في المقابل، سجلت **العقبة** قفزة نوعية في حصة الفرد لتصل إلى 302.9 م³، مدعومة بمشاريع التحلية، مما يطرح تساؤلات حول عدالة التوزيع وكفاءة الاستخدام بين المحافظات. كفاءة الموارد تعاني أيضاً من الفاقد الفني والإداري في الشبكات القديمة (خاصة في جرش والبلقاء)، مما يعني أن كميات ضخمة من المياه المدعومة تضيع قبل وصولها للمستهلك، مما يرفع كلفة المتر المكعب ويستنزف الموازنة العامة.`
+        },
+        {
+            title: "5. تحليل الفجوات والمخاطر والبيئة التنافسية",
+            content: `**فجوة الصرف الصحي:** هي القنبلة البيئية الموقوتة. في محافظة **المفرق**، لا تتجاوز نسبة المخدومين بالشبكة العامة 13.1%، بينما يعتمد 85.0% من السكان على الحفر الامتصاصية فوق أهم الأحواض الجوفية. في **الكرك**، الوضع مشابه (83.6% حفر). هذا الواقع يهدد بتلويث مصادر الشرب الجوفية بشكل لا رجعة فيه.\n**فجوة العدالة المائية:** تتجلى في التفاوت بين العقبة (97% لا يعانون نقصاً) وجرش (82% يعانون نقصاً). هذا التفاوت يخلق شعوراً بالغبن الاجتماعي ويهدد السلم الأهلي في المناطق المحرومة.\n**المخاطر:** تتمثل في استنزاف الأحواض الجوفية، وتذبذب الهطول المطري بسبب التغير المناخي، وارتفاع كلف الطاقة اللازمة لضخ المياه.`
+        },
+        {
+            title: "6. الأولويات والتوجهات الاستراتيجية للقطاع",
+            content: `تتركز الأولويات الاستراتيجية في:\n1. **الناقل الوطني:** الإسراع في تنفيذ مشروع الناقل الوطني لتحلية مياه البحر الأحمر وضخها للشمال والوسط، لتقليل الاعتماد على المياه الجوفية المستنزفة.\n2. **الحوكمة الذكية:** تركيب عدادات ذكية وأنظمة مراقبة (SCADA) لضبط الفاقد المائي وسرقة المياه، وتحسين كفاءة التحصيل المالي.\n3. **أمن التزود في الشمال:** إعطاء أولوية قصوى لمشاريع المياه في جرش وعجلون والمفرق، لتقليل الاعتماد على الصهاريج المكلفة وتعزيز استقرار التزود.`
+        },
+        {
+            title: "7. التوصيات التخطيطية ومتطلبات التنفيذ",
+            content: `نوصي بتبني خارطة طريق تنفيذية عاجلة تشمل:
+* **إعلان "الطوارئ البيئية" في المفرق:** إطلاق مشروع وطني استراتيجي لمد شبكات الصرف الصحي في المفرق والبادية الشمالية لحماية الأحواض الجوفية من التلوث، بتمويل من صناديق المناخ الدولية.
+* **تنظيم "بورصة الصهاريج":** إخضاع قطاع صهاريج المياه لنظام تتبع إلكتروني وتحديد سقوف سعرية ملزمة، ودمج أصحاب الصهاريج في منظومة الأمن المائي الرسمية لضمان الجودة والسعر العادل.
+* **محطات المعالجة اللامركزية:** تبني نموذج محطات التنقية الصغيرة (Compact Units) لخدمة القرى والتجمعات السكانية المتناثرة في الكرك وعجلون، كبديل أسرع وأوفر من الشبكات المركزية الضخمة.
+* **كودات الحصاد المائي الإلزامي:** تعديل تشريعات البناء لفرض وجود "بئر تجميع مياه أمطار" كشرط لإذن الأشغال في كافة المباني الجديدة، خاصة في محافظات الشمال ذات الهطول المطري الجيد.
+* **استبدال المحاصيل الشرهة للمياه:** تقديم حوافز للمزارعين في الأغوار والمرتفعات للتحول من المحاصيل المستهلكة للمياه (مثل الموز والحمضيات) إلى زراعات ذات قيمة مضافة عالية واستهلاك مائي منخفض (مثل النخيل والزراعات المائية).
+* **العدادات الذكية والفوترة:** تعميم تجربة العدادات الذكية في كافة المحافظات لتقليل الفاقد الإداري وضمان دقة الفواتير، مما يعزز الثقة بين المواطن وشركات المياه.`
         }
     ];
 
     const handleExportDocx = async () => {
         setIsExportingDocx(true);
         try {
-            const title = "تقرير الواقع المائي الاستراتيجي 2024";
+            const title = "التقرير القطاعي الشامل: المياه والصرف الصحي 2024";
             
             const docStyles: IStylesOptions = {
                 default: { document: { run: { font: "Arial", size: 24, rightToLeft: true } } },
@@ -62,17 +76,10 @@ const Water: React.FC = () => {
 
             const children = [
                 new Paragraph({ text: title, style: "h1" }),
-                new Paragraph({ text: "تحليل معمق للفجوة المائية، اقتصاديات التزود، والبنية التحتية للصرف الصحي.", style: "Normal" }),
-                
                 ...reportContent.flatMap(section => [
                     new Paragraph({ text: section.title, style: "h2" }),
                     new Paragraph({ text: section.content, style: "Normal" })
-                ]),
-
-                new Paragraph({ text: "4. التوصيات الاستراتيجية لصناع القرار", style: "h2" }),
-                new Paragraph({ text: "أولاً: تسريع تنفيذ مشروع الناقل الوطني كأولوية قصوى لضمان أمن التزود المائي للمراكز السكانية الكبرى (عمان، إربد، الزرقاء).", style: "Normal", bullet: { level: 0 } }),
-                new Paragraph({ text: "ثانياً: إطلاق برنامج وطني لشبكات الصرف الصحي اللامركزية في المناطق الريفية والطرفية (خاصة الكرك والمفرق) لحماية المياه الجوفية.", style: "Normal", bullet: { level: 0 } }),
-                new Paragraph({ text: "ثالثاً: مراجعة تعرفة المياه تصاعدياً لقطاعات الاستخدام الترفيهي والتجاري لتمويل صيانة الشبكات وتقليل الفاقد (NRW) الذي يتجاوز 45% في بعض المناطق.", style: "Normal", bullet: { level: 0 } }),
+                ])
             ];
 
             const doc = new Document({
@@ -107,24 +114,15 @@ const Water: React.FC = () => {
                         padding: 40px;
                         background: white !important;
                         color: black !important;
-                        font-size: 16pt;
+                        font-size: 14pt;
                         line-height: 1.6;
                     }
-                    .no-print, .recharts-wrapper, button, select, svg, .icon-container, .kpi-card-visual { display: none !important; }
-                    
-                    .card-container {
-                        box-shadow: none !important;
-                        border: none !important;
-                        padding: 0 !important;
-                        margin-bottom: 20px !important;
-                        break-inside: avoid;
-                    }
-                    
-                    h1 { font-size: 28pt; font-weight: bold; text-align: center; border-bottom: 3px solid #000; margin-bottom: 30px; padding-bottom: 10px; }
-                    h2 { font-size: 22pt; font-weight: bold; border-bottom: 1px solid #666; margin-top: 30px; margin-bottom: 15px; }
-                    h3 { font-size: 18pt; font-weight: bold; margin-top: 20px; }
+                    .no-print, .recharts-wrapper, button, svg, .icon-container, .kpi-card-visual { display: none !important; }
+                    .card-container { box-shadow: none !important; border: none !important; padding: 0 !important; margin-bottom: 20px !important; }
+                    h1 { font-size: 24pt; font-weight: bold; text-align: center; border-bottom: 3px solid #000; margin-bottom: 30px; padding-bottom: 10px; }
+                    h2 { font-size: 18pt; font-weight: bold; border-bottom: 1px solid #666; margin-top: 30px; margin-bottom: 15px; }
                     p, li { text-align: justify; margin-bottom: 12px; }
-                    
+                    strong { font-weight: bold; }
                     @page { size: A4; margin: 2.5cm; }
                 </style>
             </head>
@@ -135,12 +133,15 @@ const Water: React.FC = () => {
                 ${headContent}
                 <body>
                     <div class="report-header">
-                        <h1>التقرير الاستراتيجي: قطاع المياه والصرف الصحي</h1>
+                        <h1>التقرير القطاعي الشامل: المياه والصرف الصحي 2024</h1>
                     </div>
                     <div class="content">
-                        ${reportElement.innerHTML}
+                        ${reportContent.map(section => `
+                            <h2>${section.title}</h2>
+                            <p>${section.content.replace(/\n/g, '<br/>')}</p>
+                        `).join('')}
                     </div>
-                     <div class="report-footer" style="text-align: center; margin-top: 50px; font-size: 12pt; color: #666; border-top: 1px solid #ccc; padding-top: 10px;">
+                    <div class="report-footer" style="text-align: center; margin-top: 50px; font-size: 12pt; color: #666; border-top: 1px solid #ccc; padding-top: 10px;">
                         وزارة الداخلية - مديرية التنمية المحلية | منظومة التحليل الرقمي
                     </div>
                 </body>
@@ -174,61 +175,70 @@ const Water: React.FC = () => {
             </div>
             <div id="report-content" className="space-y-8">
                 <header className="text-center border-b border-gray-200 dark:border-gray-700 pb-8 no-print">
-                    <h1 className="text-3xl font-bold text-gray-900">تحليلات قطاع المياه والصرف الصحي</h1>
-                    <p className="text-lg text-gray-700 mt-1">تحليل استراتيجي للواقع المائي وتحديات البنية التحتية (2024)</p>
+                    <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">التقرير الاستراتيجي: قطاع المياه والصرف الصحي</h1>
+                    <p className="text-lg text-gray-500 dark:text-gray-400 mt-2 max-w-3xl mx-auto">
+                        تحليل معمق للواقع المائي، فجوات التزود، وتحديات الصرف الصحي (2024).
+                    </p>
                 </header>
 
                 {reportContent.map((section, idx) => (
                     <Card key={idx} className="card-container">
-                        <h2 className="text-xl font-bold text-gray-900 mb-3">{section.title}</h2>
-                        <div className="text-gray-700 leading-relaxed text-lg whitespace-pre-line">
-                            {section.content}
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{section.title}</h2>
+                        <div className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg whitespace-pre-line">
+                            {section.content.split('\n').map((line, i) => {
+                                const parts = line.split(/(\*\*.*?\*\*)/g);
+                                return (
+                                    <p key={i} className="mb-3">
+                                        {parts.map((part, j) => 
+                                            part.startsWith('**') && part.endsWith('**') 
+                                                ? <strong key={j} className="font-bold text-blue-900 dark:text-blue-400">{part.slice(2, -2)}</strong> 
+                                                : part
+                                        )}
+                                    </p>
+                                );
+                            })}
                         </div>
+                        
+                        {/* Visualization for Water Trend (after Section 5) */}
+                        {idx === 4 && (
+                            <div className="mt-8 pt-6 border-t border-gray-200 no-print">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="text-lg font-semibold text-gray-800">المؤشر البياني: حصّة الفرد من المياه (2020-2023)</h3>
+                                    <select
+                                        value={selectedGov}
+                                        onChange={(e) => setSelectedGov(e.target.value)}
+                                        className="bg-gray-100 border border-gray-300 rounded-md p-2 text-sm"
+                                    >
+                                        {governorateData.map(g => <option key={g.name} value={g.name}>{g.name_ar}</option>)}
+                                    </select>
+                                </div>
+                                {selectedGovTrendData && <WaterTrendChart data={selectedGovTrendData} />}
+                            </div>
+                        )}
+
+                        {/* Visualization for Water Sources (after Section 2) */}
+                        {idx === 2 && (
+                            <div className="mt-8 pt-6 border-t border-gray-200 no-print">
+                                <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">توزيع مصادر مياه الشرب الرئيسية للأسر (%)</h3>
+                                <div style={{ width: '100%', height: 450 }}>
+                                    <ResponsiveContainer>
+                                        <BarChart data={WATER_SOURCES_DATA.filter(d => d.name !== 'Kingdom')} layout="vertical" margin={{ left: 20, right: 20, top: 20, bottom: 20 }}>
+                                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(128,128,128,0.2)" />
+                                            <XAxis type="number" unit="%" tick={{ fontSize: 12, fill: '#333333' }} domain={[0, 100]} />
+                                            <YAxis type="category" dataKey="name_ar" width={70} tick={{ fontSize: 12, fill: '#333333', fontWeight: 'bold' }} />
+                                            <Tooltip formatter={(value: number) => `${value.toFixed(1)}%`} contentStyle={{ backgroundColor: 'rgba(31, 41, 55, 0.9)', color: '#fff', borderRadius: '8px', border: 'none' }} />
+                                            <Legend wrapperStyle={{ paddingTop: '20px' }} iconType="circle" />
+                                            <Bar dataKey="public_network" name="شبكة عامة" stackId="a" fill="#3b82f6" barSize={20} />
+                                            <Bar dataKey="tanker" name="صهريج" stackId="a" fill="#f97316" barSize={20} />
+                                            <Bar dataKey="mineral_water" name="مياه معدنية" stackId="a" fill="#10b981" barSize={20} />
+                                            <Bar dataKey="rainwater" name="آبار تجميع" stackId="a" fill="#06b6d4" barSize={20} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+                        )}
                     </Card>
                 ))}
-
-                <Card className="card-container">
-                    <h2 className="text-xl font-bold text-gray-900 mb-4">4. الخلاصة والتوصيات العاجلة</h2>
-                    <div className="space-y-4 text-gray-800 text-lg">
-                        <p><strong>إدارة الأزمة:</strong> الوضع المائي في الأردن لا يحتمل التأجيل. الاعتماد على الحلول المؤقتة (الصهاريج) يرهق المواطن والدولة. يجب التحول الفوري نحو إدارة الطلب بصرامة، ورفع كفاءة الشبكات لتقليل الفاقد الذي يصل لمستويات حرجة.</p>
-                        <p><strong>الاستدامة البيئية:</strong> التوسع في شبكات الصرف الصحي في المناطق الريفية ليس ترفاً بل ضرورة لحماية ما تبقى من مياه جوفية صالحة للشرب.</p>
-                        <p><strong>الناقل الوطني:</strong> تسريع تنفيذ مشروع الناقل الوطني كأولوية قصوى لضمان أمن التزود المائي للمراكز السكانية الكبرى (عمان، إربد، الزرقاء).</p>
-                    </div>
-                </Card>
-
-                <Card className="no-print">
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-semibold text-gray-800">حصّة الفرد من المياه (م³/سنوياً)</h3>
-                        <select
-                            value={selectedGov}
-                            onChange={(e) => setSelectedGov(e.target.value)}
-                            className="bg-gray-100 border border-gray-300 rounded-md p-2 text-sm"
-                        >
-                            {governorateData.map(g => <option key={g.name} value={g.name}>{g.name_ar}</option>)}
-                        </select>
-                    </div>
-                    {selectedGovTrendData && <WaterTrendChart data={selectedGovTrendData} />}
-                </Card>
-
-                <Card className="no-print">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">مصدر مياه الشرب الرئيسي للأسر (%)</h3>
-                    <div style={{ width: '100%', height: 400 }}>
-                        <ResponsiveContainer>
-                            <BarChart data={WATER_SOURCES_DATA.filter(d => d.name !== 'Kingdom')} layout="vertical" margin={{ left: 20 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(128,128,128,0.2)" />
-                                <XAxis type="number" unit="%" tick={{ fontSize: 12, fill: '#333333' }} />
-                                <YAxis type="category" dataKey="name_ar" width={80} tick={{ fontSize: 12, fill: '#333333' }} />
-                                <Tooltip formatter={(value: number) => `${value.toFixed(1)}%`} contentStyle={{ backgroundColor: 'rgba(31, 41, 55, 0.8)' }} />
-                                <Legend />
-                                <Bar dataKey="public_network" name="شبكة عامة" stackId="a" fill="#3b82f6" />
-                                <Bar dataKey="tanker" name="صهريج" stackId="a" fill="#f97316" />
-                                <Bar dataKey="mineral_water" name="مياه معدنية" stackId="a" fill="#84cc16" />
-                                <Bar dataKey="rainwater" name="آبار تجميع" stackId="a" fill="#06b6d4" />
-                                <Bar dataKey="other" name="أخرى" stackId="a" fill="#a8a29e" />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </Card>
             </div>
         </div>
     );

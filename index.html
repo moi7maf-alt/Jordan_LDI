@@ -22,6 +22,8 @@
 }
 </script>
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Traditional+Arabic:wght@400;700&display=swap');
+
     .map-tooltip {
       position: absolute;
       background-color: rgba(17, 24, 39, 0.9);
@@ -41,30 +43,34 @@
     @media print {
       @page {
         size: A4;
-        margin: 2.5cm 2cm; /* Generous margins for readability */
+        margin: 2cm;
       }
 
       body {
         background-color: white !important;
         color: #000 !important;
-        font-family: 'Times New Roman', 'Traditional Arabic', serif !important; /* Serif fonts are better for long print reading */
-        font-size: 14pt !important;
-        line-height: 1.6 !important;
+        font-family: 'Traditional Arabic', 'Times New Roman', serif !important;
+        font-size: 12pt !important;
+        line-height: 1.5 !important;
+        -webkit-print-color-adjust: exact; 
       }
 
-      /* HIDE Visuals */
+      /* HIDE ALL VISUALS */
       aside, header, .no-print, 
       .recharts-wrapper, 
       .icon-container, 
       svg, 
       button, 
       select,
-      .kpi-card-visual, /* Class to hide KPI boxes in print */
-      iframe {
+      .kpi-card-visual, 
+      iframe,
+      .icon-wrapper,
+      .kpi-section,
+      .chart-container {
         display: none !important;
       }
       
-      /* Reset layout for main content area to allow natural flow */
+      /* Reset layout for main content area */
       body, #root, #root > div, main, .flex, .grid {
         display: block !important;
         height: auto !important;
@@ -76,41 +82,41 @@
         float: none !important;
       }
 
-      /* Headings */
+      /* Document Headings */
       h1 {
         font-size: 24pt !important;
         font-weight: bold !important;
         text-align: center !important;
         border-bottom: 2px solid #000 !important;
-        margin-bottom: 30px !important;
+        margin-bottom: 20px !important;
         padding-bottom: 10px !important;
         color: #000 !important;
       }
 
       h2 {
-        font-size: 18pt !important;
+        font-size: 16pt !important;
         font-weight: bold !important;
         border-bottom: 1px solid #ccc !important;
-        margin-top: 30px !important;
-        margin-bottom: 15px !important;
+        margin-top: 25px !important;
+        margin-bottom: 10px !important;
         color: #000 !important;
         page-break-after: avoid;
       }
 
-      h3 {
-        font-size: 16pt !important;
+      h3, h4 {
+        font-size: 14pt !important;
         font-weight: bold !important;
-        margin-top: 20px !important;
-        margin-bottom: 10px !important;
+        margin-top: 15px !important;
+        margin-bottom: 5px !important;
         color: #000 !important;
         page-break-after: avoid;
       }
 
       /* Text Content */
       p, li {
-        font-size: 14pt !important;
+        font-size: 12pt !important;
         text-align: justify !important;
-        margin-bottom: 12px !important;
+        margin-bottom: 8px !important;
         color: #000 !important;
       }
 
@@ -126,17 +132,11 @@
         border: none !important;
         background: transparent !important;
         padding: 0 !important;
-        margin: 0 0 15px 0 !important;
+        margin: 0 0 10px 0 !important;
       }
 
-      /* Ensure page breaks are handled gracefully */
       .page-break {
         page-break-before: always;
-      }
-      
-      /* Show elements specifically marked for print */
-      .print-only {
-        display: block !important;
       }
     }
 </style>

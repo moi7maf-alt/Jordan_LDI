@@ -1,7 +1,7 @@
 
 // types.ts
 
-export type View = 'dashboard' | 'womens_development' | 'education' | 'health' | 'agricultural_development' | 'income' | 'local_administration' | 'security' | 'chatbot' | 'reports' | 'development_plan' | 'water' | 'local_development_index' | 'predictive_analysis' | 'data_sources' | 'social_development';
+export type View = 'dashboard' | 'womens_development' | 'education' | 'health' | 'agricultural_development' | 'income' | 'local_administration' | 'security' | 'chatbot' | 'reports' | 'development_plan' | 'water' | 'local_development_index' | 'predictive_analysis' | 'data_sources' | 'social_development' | 'priorities';
 
 export interface GovernorateData {
   name: string;
@@ -365,4 +365,18 @@ export interface MaternalChildHealthData {
   births_in_health_facilities: number;
   adolescent_fertility_rate: number;
   violence_against_children_rate: number;
+}
+
+export interface PriorityNeed {
+    rank: number;
+    sector: string;
+    need: string;
+    justification: string;
+    sectorColor?: string;
+}
+
+export interface GovernoratePriorities {
+    name: string;
+    name_ar: string;
+    needs: PriorityNeed[];
 }
