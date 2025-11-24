@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>منظومة التحليل التنموي المعززة بالذكاء الاصطناعي لمحافظات المملكة الأردنية الهاشمية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  <script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.28.0",
+    "recharts": "https://aistudiocdn.com/recharts@^3.3.0",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "docx": "https://aistudiocdn.com/docx@^8.5.0",
+    "file-saver": "https://aistudiocdn.com/file-saver@^2.0.5",
+    "jspdf": "https://aistudiocdn.com/jspdf@^2.5.1",
+    "html2canvas": "https://aistudiocdn.com/html2canvas@^1.4.1"
+  }
+}
+</script>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Traditional+Arabic:wght@400;700&display=swap');
+
+    .map-tooltip {
+      position: absolute;
+      background-color: rgba(17, 24, 39, 0.9);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      opacity: 0;
+      transform: translate(-50%, -110%);
+      white-space: nowrap;
+      z-index: 10;
+    }
+
+    /* Print Styling for Text-Only Reports */
+    @media print {
+      @page {
+        size: A4;
+        margin: 2cm;
+      }
+
+      body {
+        background-color: white !important;
+        color: #000 !important;
+        font-family: 'Traditional Arabic', 'Times New Roman', serif !important;
+        font-size: 12pt !important;
+        line-height: 1.5 !important;
+        -webkit-print-color-adjust: exact; 
+      }
+
+      /* HIDE ALL VISUALS */
+      aside, header, .no-print, 
+      .recharts-wrapper, 
+      .icon-container, 
+      svg, 
+      button, 
+      select,
+      .kpi-card-visual, 
+      iframe,
+      .icon-wrapper,
+      .kpi-section,
+      .chart-container {
+        display: none !important;
+      }
+      
+      /* Reset layout for main content area */
+      body, #root, #root > div, main, .flex, .grid {
+        display: block !important;
+        height: auto !important;
+        width: 100% !important;
+        overflow: visible !important;
+        position: static !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        float: none !important;
+      }
+
+      /* Document Headings */
+      h1 {
+        font-size: 24pt !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        border-bottom: 2px solid #000 !important;
+        margin-bottom: 20px !important;
+        padding-bottom: 10px !important;
+        color: #000 !important;
+      }
+
+      h2 {
+        font-size: 16pt !important;
+        font-weight: bold !important;
+        border-bottom: 1px solid #ccc !important;
+        margin-top: 25px !important;
+        margin-bottom: 10px !important;
+        color: #000 !important;
+        page-break-after: avoid;
+      }
+
+      h3, h4 {
+        font-size: 14pt !important;
+        font-weight: bold !important;
+        margin-top: 15px !important;
+        margin-bottom: 5px !important;
+        color: #000 !important;
+        page-break-after: avoid;
+      }
+
+      /* Text Content */
+      p, li {
+        font-size: 12pt !important;
+        text-align: justify !important;
+        margin-bottom: 8px !important;
+        color: #000 !important;
+      }
+
+      /* Lists */
+      ul {
+        margin-right: 20px !important;
+        list-style-type: disc !important;
+      }
+
+      /* Cards cleanup */
+      .card-container, div[class*="bg-"] {
+        box-shadow: none !important;
+        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 0 10px 0 !important;
+      }
+
+      .page-break {
+        page-break-before: always;
+      }
+    }
+</style>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-gray-100">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
