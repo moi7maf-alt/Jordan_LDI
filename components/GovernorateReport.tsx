@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect, ReactNode, useMemo } from 'react';
 import { GovernorateData } from '../types';
-//import { generateGovernorateReport } from '../services/geminiService';
+
+import { generateGovernorateReport } from '../services/geminiService';
 import { Document, Packer, Paragraph, TextRun, AlignmentType, HeadingLevel, IStylesOptions } from 'docx';
 import saveAs from 'file-saver';
 import Card from './ui/Card';
@@ -178,10 +179,7 @@ const GovernorateReport: React.FC<GovernorateReportProps> = ({ governorate }) =>
                     sanitationCoverage: sanitationData?.public_network,
                     trafficAccidents: trafficData?.total,
                 };
-                // 🛑 تم تعطيل استدعاء الذكاء الاصطناعي مؤقتاً لحل مشكلة النشر
-                // const content = await generateGovernorateReport(reportData); 
-                // 💡 محتوى وهمي مؤقت لضمان عدم انهيار التطبيق
-                const content = "## 🚧 التحليل غير متاح حاليًا 🚧\n\n**عذراً:** تم تعطيل ميزة إنشاء التقارير بالذكاء الاصطناعي مؤقتاً لحل مشكلة فشل النشر. ستعود البيانات التحليلية للظهور بعد حل مشكلة إعداد المفتاح (API Key) على Vercel.";
+                const content = await generateGovernorateReport(reportData);
                 setReportContent(content);
             } catch (err: any) {
                 setError(err.message || `Failed to generate report for ${governorate.name_ar}.`);
