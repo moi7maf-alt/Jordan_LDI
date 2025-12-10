@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, ReactNode, useMemo } from 'react';
 import { GovernorateData } from '../types';
+
 import { generateGovernorateReport } from '../services/geminiService';
 import { Document, Packer, Paragraph, TextRun, AlignmentType, HeadingLevel, IStylesOptions } from 'docx';
 import saveAs from 'file-saver';
@@ -178,9 +179,8 @@ const GovernorateReport: React.FC<GovernorateReportProps> = ({ governorate }) =>
                     sanitationCoverage: sanitationData?.public_network,
                     trafficAccidents: trafficData?.total,
                 };
-
                 const content = await generateGovernorateReport(reportData);
-                setReportContent(content);
+                setReportContent(content);
             } catch (err: any) {
                 setError(err.message || `Failed to generate report for ${governorate.name_ar}.`);
             } finally {
