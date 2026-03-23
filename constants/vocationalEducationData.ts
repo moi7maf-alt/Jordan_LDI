@@ -1,0 +1,226 @@
+import { VocationalEducationData } from '../types';
+
+// Source: User-provided images for vocational education
+export const VOCATIONAL_EDUCATION_DATA: VocationalEducationData[] = [
+  {
+    name_ar: 'عمان',
+    agricultural: [
+        { year: 2020, female: 23, male: 24, gender_gap: 1 },
+        { year: 2021, female: 22, male: 23, gender_gap: 1 },
+        { year: 2022, female: 23, male: 23, gender_gap: 0 },
+        { year: 2023, female: 23.6, male: 23.6, gender_gap: 0 },
+        { year: 2024, female: 24.6, male: 24.6, gender_gap: 0 },
+    ],
+    industrial: [
+        { year: 2020, female: 1.3, male: 98.7, gender_gap: 97.5 },
+        { year: 2021, female: 1.5, male: 98.5, gender_gap: 97.0 },
+        { year: 2022, female: 1.5, male: 98.5, gender_gap: 97.0 },
+        { year: 2023, female: 2.3, male: 97.7, gender_gap: 95.4 },
+        { year: 2024, female: 2.8, male: 97.2, gender_gap: 94.4 },
+    ],
+  },
+  {
+    name_ar: 'البلقاء',
+    agricultural: [
+        { year: 2020, female: 0, male: 100, gender_gap: 100 },
+        { year: 2021, female: 0, male: 100, gender_gap: 100 },
+        { year: 2022, female: 0, male: 100, gender_gap: 100 },
+        { year: 2023, female: 0, male: 100, gender_gap: 100 },
+        { year: 2024, female: 0, male: 100, gender_gap: 100 },
+    ],
+    industrial: [
+        { year: 2020, female: 0, male: 100, gender_gap: 100 },
+        { year: 2021, female: 0, male: 100, gender_gap: 100 },
+        { year: 2022, female: 0, male: 100, gender_gap: 100 },
+        { year: 2023, female: 0, male: 100, gender_gap: 100 },
+        { year: 2024, female: 5.4, male: 94.6, gender_gap: 89.2 },
+    ],
+  },
+   {
+    name_ar: 'الزرقاء',
+    agricultural: [
+        { year: 2020, female: 0, male: 100, gender_gap: 100 },
+        { year: 2021, female: 0, male: 100, gender_gap: 100 },
+        { year: 2022, female: 0, male: 100, gender_gap: 100 },
+        { year: 2023, female: 0, male: 100, gender_gap: 100 },
+        { year: 2024, female: 0, male: 100, gender_gap: 100 },
+    ],
+    industrial: [
+        { year: 2020, female: 3.4, male: 96.6, gender_gap: 93.2 },
+        { year: 2021, female: 3.5, male: 96.5, gender_gap: 92.9 },
+        { year: 2022, female: 3.5, male: 96.5, gender_gap: 93.0 },
+        { year: 2023, female: 3.5, male: 96.5, gender_gap: 93.0 },
+        { year: 2024, female: 3.8, male: 96.2, gender_gap: 92.4 },
+    ],
+  },
+  {
+    name_ar: 'مأدبا',
+    agricultural: [
+        { year: 2020, female: 0, male: 100, gender_gap: 100 },
+        { year: 2021, female: 0, male: 100, gender_gap: 100 },
+        { year: 2022, female: 0, male: 100, gender_gap: 100 },
+        { year: 2023, female: 0, male: 100, gender_gap: 100 },
+        { year: 2024, female: 0, male: 100, gender_gap: 100 },
+    ],
+    industrial: [
+        { year: 2020, female: 0, male: 100, gender_gap: 100 },
+        { year: 2021, female: 0, male: 100, gender_gap: 100 },
+        { year: 2022, female: 0, male: 100, gender_gap: 100 },
+        { year: 2023, female: 0, male: 100, gender_gap: 100 },
+        { year: 2024, female: 0, male: 100, gender_gap: 100 },
+    ],
+  },
+  {
+    name_ar: 'إربد',
+    agricultural: [
+        { year: 2020, female: 24.6, male: 75.4, gender_gap: 50.8 },
+        { year: 2021, female: 25.5, male: 74.5, gender_gap: 49.0 },
+        { year: 2022, female: 25.5, male: 74.5, gender_gap: 49.0 },
+        { year: 2023, female: 26.3, male: 73.7, gender_gap: 47.4 },
+        { year: 2024, female: 26.9, male: 73.1, gender_gap: 46.2 },
+    ],
+    industrial: [
+        { year: 2020, female: 1.6, male: 98.4, gender_gap: 96.7 },
+        { year: 2021, female: 1.4, male: 98.6, gender_gap: 97.1 },
+        { year: 2022, female: 1.4, male: 98.6, gender_gap: 97.3 },
+        { year: 2023, female: 1.3, male: 98.7, gender_gap: 97.3 },
+        { year: 2024, female: 1.5, male: 98.5, gender_gap: 97.0 },
+    ],
+  },
+  {
+    name_ar: 'المفرق',
+    agricultural: [
+        { year: 2020, female: 52.7, male: 47.3, gender_gap: -5.5 },
+        { year: 2021, female: 52.1, male: 47.9, gender_gap: -4.2 },
+        { year: 2022, female: 53.9, male: 46.1, gender_gap: -7.8 },
+        { year: 2023, female: 46.4, male: 53.6, gender_gap: 7.2 },
+        { year: 2024, female: 50.5, male: 49.5, gender_gap: -1.0 },
+    ],
+    industrial: [
+        { year: 2020, female: 0, male: 100, gender_gap: 100 },
+        { year: 2021, female: 0, male: 100, gender_gap: 100 },
+        { year: 2022, female: 2.9, male: 97.1, gender_gap: 94.2 },
+        { year: 2023, female: 5.6, male: 94.4, gender_gap: 88.7 },
+        { year: 2024, female: 3.8, male: 96.2, gender_gap: 92.4 },
+    ],
+  },
+  {
+    name_ar: 'جرش',
+    agricultural: [
+        { year: 2020, female: 0, male: 100, gender_gap: 100 },
+        { year: 2021, female: 0, male: 100, gender_gap: 100 },
+        { year: 2022, female: 0, male: 100, gender_gap: 100 },
+        { year: 2023, female: 0, male: 100, gender_gap: 100 },
+        { year: 2024, female: 0, male: 100, gender_gap: 100 },
+    ],
+    industrial: [
+        { year: 2020, female: 0, male: 100, gender_gap: 100 },
+        { year: 2021, female: 0, male: 100, gender_gap: 100 },
+        { year: 2022, female: 0, male: 100, gender_gap: 100 },
+        { year: 2023, female: 0, male: 100, gender_gap: 100 },
+        { year: 2024, female: 0, male: 100, gender_gap: 100 },
+    ],
+  },
+  {
+    name_ar: 'عجلون',
+    agricultural: [
+        { year: 2020, female: 0, male: 100, gender_gap: 100 },
+        { year: 2021, female: 0, male: 100, gender_gap: 100 },
+        { year: 2022, female: 0, male: 100, gender_gap: 100 },
+        { year: 2023, female: 0, male: 100, gender_gap: 100 },
+        { year: 2024, female: 0, male: 100, gender_gap: 100 },
+    ],
+    industrial: [
+        { year: 2020, female: 0, male: 100, gender_gap: 100 },
+        { year: 2021, female: 0, male: 100, gender_gap: 100 },
+        { year: 2022, female: 0, male: 100, gender_gap: 100 },
+        { year: 2023, female: 0, male: 100, gender_gap: 100 },
+        { year: 2024, female: 0, male: 100, gender_gap: 100 },
+    ],
+  },
+  {
+    name_ar: 'الكرك',
+    agricultural: [
+        { year: 2020, female: 0, male: 100, gender_gap: 100 },
+        { year: 2021, female: 0, male: 100, gender_gap: 100 },
+        { year: 2022, female: 0, male: 100, gender_gap: 100 },
+        { year: 2023, female: 0, male: 100, gender_gap: 100 },
+        { year: 2024, female: 0, male: 100, gender_gap: 100 },
+    ],
+    industrial: [
+        { year: 2020, female: 0, male: 100, gender_gap: 100 },
+        { year: 2021, female: 0, male: 100, gender_gap: 100 },
+        { year: 2022, female: 0, male: 100, gender_gap: 100 },
+        { year: 2023, female: 0, male: 100, gender_gap: 100 },
+        { year: 2024, female: 0, male: 100, gender_gap: 100 },
+    ],
+  },
+  {
+    name_ar: 'الطفيلة',
+    agricultural: [
+        { year: 2020, female: 0, male: 100, gender_gap: 100 },
+        { year: 2021, female: 0, male: 100, gender_gap: 100 },
+        { year: 2022, female: 0, male: 100, gender_gap: 100 },
+        { year: 2023, female: 0, male: 100, gender_gap: 100 },
+        { year: 2024, female: 0, male: 100, gender_gap: 100 },
+    ],
+    industrial: [
+        { year: 2020, female: 0, male: 100, gender_gap: 100 },
+        { year: 2021, female: 0, male: 100, gender_gap: 100 },
+        { year: 2022, female: 0, male: 100, gender_gap: 100 },
+        { year: 2023, female: 0, male: 100, gender_gap: 100 },
+        { year: 2024, female: 0, male: 100, gender_gap: 100 },
+    ],
+  },
+  {
+    name_ar: 'معان',
+    agricultural: [
+        { year: 2020, female: 0, male: 100, gender_gap: 100 },
+        { year: 2021, female: 0, male: 100, gender_gap: 100 },
+        { year: 2022, female: 0, male: 100, gender_gap: 100 },
+        { year: 2023, female: 0, male: 100, gender_gap: 100 },
+        { year: 2024, female: 0, male: 100, gender_gap: 100 },
+    ],
+    industrial: [
+        { year: 2020, female: 0, male: 100, gender_gap: 100 },
+        { year: 2021, female: 0, male: 100, gender_gap: 100 },
+        { year: 2022, female: 0, male: 100, gender_gap: 100 },
+        { year: 2023, female: 0, male: 100, gender_gap: 100 },
+        { year: 2024, female: 0, male: 100, gender_gap: 100 },
+    ],
+  },
+  {
+    name_ar: 'العقبة',
+    agricultural: [
+        { year: 2020, female: 0, male: 100, gender_gap: 100 },
+        { year: 2021, female: 0, male: 100, gender_gap: 100 },
+        { year: 2022, female: 0, male: 100, gender_gap: 100 },
+        { year: 2023, female: 0, male: 100, gender_gap: 100 },
+        { year: 2024, female: 0, male: 100, gender_gap: 100 },
+    ],
+    industrial: [
+        { year: 2020, female: 0, male: 100, gender_gap: 100 },
+        { year: 2021, female: 0, male: 100, gender_gap: 100 },
+        { year: 2022, female: 0, male: 100, gender_gap: 100 },
+        { year: 2023, female: 0, male: 100, gender_gap: 100 },
+        { year: 2024, female: 0, male: 100, gender_gap: 100 },
+    ],
+  },
+  {
+    name_ar: 'المملكة',
+    agricultural: [
+        { year: 2020, female: 16.5, male: 83.5, gender_gap: 66.9 },
+        { year: 2021, female: 16.5, male: 83.5, gender_gap: 67.0 },
+        { year: 2022, female: 16.6, male: 83.4, gender_gap: 66.7 },
+        { year: 2023, female: 17.5, male: 82.5, gender_gap: 65.0 },
+        { year: 2024, female: 18.1, male: 81.9, gender_gap: 63.8 },
+    ],
+    industrial: [
+        { year: 2020, female: 1.2, male: 98.8, gender_gap: 97.5 },
+        { year: 2021, female: 1.2, male: 98.8, gender_gap: 97.5 },
+        { year: 2022, female: 1.4, male: 98.6, gender_gap: 97.2 },
+        { year: 2023, female: 1.9, male: 98.1, gender_gap: 96.2 },
+        { year: 2024, female: 2.4, male: 97.6, gender_gap: 95.2 },
+    ],
+  },
+];

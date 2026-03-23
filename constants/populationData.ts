@@ -1,0 +1,35 @@
+import { PopulationData } from '../types';
+
+export const POPULATION_DATA_2024: PopulationData[] = [
+  { name: 'Amman', name_ar: 'عمان', population: 4920100, area: 7579, density: 649.2 },
+  { name: 'Balqa', name_ar: 'البلقاء', population: 603700, area: 1120, density: 538.8 },
+  { name: 'Zarqa', name_ar: 'الزرقاء', population: 1675700, area: 4761, density: 351.9 },
+  { name: 'Madaba', name_ar: 'مأدبا', population: 232300, area: 940, density: 247.2 },
+  { name: 'Irbid', name_ar: 'إربد', population: 2173200, area: 1572, density: 1382.6 },
+  { name: 'Mafraq', name_ar: 'المفرق', population: 675200, area: 26551, density: 25.4 },
+  { name: 'Jarash', name_ar: 'جرش', population: 291000, area: 410, density: 710.1 },
+  { name: 'Ajloun', name_ar: 'عجلون', population: 216200, area: 420, density: 515.2 },
+  { name: 'Karak', name_ar: 'الكرك', population: 388700, area: 3495, density: 111.2 },
+  { name: 'Tafilah', name_ar: 'الطفيلة', population: 118200, area: 2209, density: 53.5 },
+  { name: 'Maan', name_ar: 'معان', population: 194500, area: 32832, density: 5.9 },
+  { name: 'Aqaba', name_ar: 'العقبة', population: 245200, area: 6905, density: 35.5 },
+
+  // Population data for police directorates for accurate crime rate calculation
+  { name: 'إقليم العاصمة', name_ar: 'إقليم العاصمة', population: 4671645, area: 0, density: 0 },
+  { name: 'وسط عمان', name_ar: 'وسط عمان', population: 1050870, area: 0, density: 0 },
+  { name: 'جنوب عمان', name_ar: 'جنوب عمان', population: 980909, area: 0, density: 0 },
+  { name: 'شمال عمان', name_ar: 'شمال عمان', population: 1254516, area: 0, density: 0 },
+  { name: 'شرق عمان', name_ar: 'شرق عمان', population: 1385350, area: 0, density: 0 },
+  { name: 'إقليم الوسط', name_ar: 'إقليم الوسط', population: 2490766, area: 0, density: 0 },
+  { name: 'الرصيفة', name_ar: 'الرصيفة', population: 591640, area: 0, density: 0 },
+  { name: 'غرب البلقاء', name_ar: 'غرب البلقاء', population: 154930, area: 0, density: 0 },
+  { name: 'إقليم الشمال', name_ar: 'إقليم الشمال', population: 3130634, area: 0, density: 0 },
+  { name: 'غرب اربد', name_ar: 'غرب اربد', population: 411690, area: 0, density: 0 },
+  { name: 'الرمثا', name_ar: 'الرمثا', population: 292805, area: 0, density: 0 },
+  { name: 'إقليم الجنوب', name_ar: 'إقليم الجنوب', population: 923956, area: 0, density: 0 },
+  { name: 'غرب معان', name_ar: 'غرب معان', population: 65465, area: 0, density: 0 },
+  { name: 'شرطة البادية الملكية', name_ar: 'شرطة البادية الملكية', population: 516999, area: 0, density: 0 },
+  { name: 'البادية الشمالية', name_ar: 'البادية الشمالية', population: 224966, area: 0, density: 0 },
+  { name: 'البادية الوسطى', name_ar: 'البادية الوسطى', population: 269389, area: 0, density: 0 },
+  { name: 'البادية الجنوبية', name_ar: 'البادية الجنوبية', population: 22644, area: 0, density: 0 },
+];
