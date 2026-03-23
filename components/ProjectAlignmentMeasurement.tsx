@@ -231,6 +231,49 @@ const ProjectAlignmentMeasurement: React.FC = () => {
                 </div>
             </div>
 
+            {/* Governorate Budget Projects Alignment Section */}
+            <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div className="mb-8">
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <span className="text-blue-500">📋</span> مواءمة مشاريع موازنة المحافظة مع الرؤية
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 mt-1">كيف تخدم المشاريع "التقليدية" في موازنتك أهداف رؤية التحديث الاقتصادي؟</p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {(ECONOMIC_VISION_DATA as any).budget_projects_mapping.map((item: any, index: number) => (
+                        <motion.div
+                            key={index}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            viewport={{ once: true }}
+                            className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700"
+                        >
+                            <h4 className="font-bold text-blue-600 dark:text-blue-400 mb-3 flex items-center gap-2">
+                                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                {item.category}
+                            </h4>
+                            <div className="flex flex-wrap gap-1.5 mb-4">
+                                {item.projects.map((p: string, i: number) => (
+                                    <span key={i} className="px-2 py-0.5 bg-white dark:bg-slate-700 text-[10px] text-slate-600 dark:text-slate-300 rounded border border-slate-200 dark:border-slate-600">
+                                        {p}
+                                    </span>
+                                ))}
+                            </div>
+                            <div className="space-y-2 pt-3 border-t border-slate-200 dark:border-slate-700">
+                                <div className="flex justify-between text-[11px]">
+                                    <span className="text-slate-500">محرك الرؤية:</span>
+                                    <span className="font-bold text-slate-900 dark:text-white">{item.vision_driver}</span>
+                                </div>
+                                <p className="text-[11px] text-slate-600 dark:text-gray-400 leading-relaxed italic">
+                                    <span className="font-bold not-italic">الأثر الاستراتيجي: </span> {item.impact}
+                                </p>
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
+            </div>
+
             {/* AI Alignment Tool */}
             <Card id="alignment-tool" className="border-2 border-amber-500/20 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
