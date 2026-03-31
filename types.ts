@@ -146,6 +146,7 @@ export interface GovernorateIncomeData {
 export interface UnemploymentDataPoint {
   year: number;
   rate: number;
+  note?: string;
 }
 
 export interface GovernorateUnemploymentData {
@@ -365,6 +366,15 @@ export interface MaternalChildHealthData {
   births_in_health_facilities: number;
   adolescent_fertility_rate: number;
   violence_against_children_rate: number;
+}
+
+export interface HealthRatesData {
+  name_ar: string;
+  specialist_rate: number;
+  gp_rate: number;
+  dentist_rate: number;
+  pharmacist_rate: number;
+  nurse_rate: number;
 }
 
 export interface PriorityNeed {

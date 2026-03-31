@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 import Card from './ui/Card';
 import { TRAFFIC_ACCIDENTS_2024 } from '../constants/trafficAccidentsData';
 import { CRIME_DATA_2024 } from '../constants/crimeData';
-import { POPULATION_DATA_2024 } from '../constants/populationData';
+import { POPULATION_DATA_2025 } from '../constants/populationData';
 import CrimeBreakdownChart from './charts/CrimeBreakdownChart';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
 import { Document, Packer, Paragraph, TextRun, AlignmentType, IStylesOptions } from 'docx';
@@ -30,7 +30,7 @@ const Security: React.FC = () => {
 
         const crimeDataMap = new Map(CRIME_DATA_2024.map(d => [d.region, d]));
 
-        const governorateData = POPULATION_DATA_2024.filter(p => p.area > 0).map(pop => {
+        const governorateData = POPULATION_DATA_2025.filter(p => p.area > 0).map(pop => {
             const policeRegionsForGov = governoratePoliceRegionMapping[pop.name] || [];
             
             const aggregatedCrimeData = policeRegionsForGov.reduce((acc, regionName) => {

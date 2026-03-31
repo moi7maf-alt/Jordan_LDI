@@ -7,6 +7,7 @@ import { GovernorateData } from '../types';
 
 const Reports: React.FC = () => {
     const [selectedGovernorate, setSelectedGovernorate] = useState<string>('Amman');
+    const [showReport, setShowReport] = useState(false);
     const [customTopic, setCustomTopic] = useState('');
     const [generatedReport, setGeneratedReport] = useState<string>('');
     const [isLoading, setIsLoading] = useState(false);
@@ -43,15 +44,26 @@ const Reports: React.FC = () => {
             <Card>
                  <h2 className="text-xl font-bold text-gray-900 mb-4">تقارير المحافظات</h2>
                  <p className="text-sm text-gray-700 mb-4">اختر محافظة لعرض تقرير تحليلي مفصل عن وضعها التنموي.</p>
-                 <select
-                    value={selectedGovernorate}
-                    onChange={(e) => setSelectedGovernorate(e.target.value)}
-                    className="w-full md:w-1/3 bg-gray-100 border border-gray-300 rounded-md p-2 text-sm mb-6"
-                 >
-                    {GOVERNORATES_DATA.map(g => <option key={g.name} value={g.name}>{g.name_ar}</option>)}
-                 </select>
+                 <div className="flex flex-col md:flex-row gap-4 mb-6">
+                     <select
+                        value={selectedGovernorate}
+                        onChange={(e) => {
+                            setSelectedGovernorate(e.target.value);
+                            setShowReport(false);
+                        }}
+                        className="w-full md:w-1/3 bg-gray-100 border border-gray-300 rounded-md p-2 text-sm"
+                     >
+                        {GOVERNORATES_DATA.map(g => <option key={g.name} value={g.name}>{g.name_ar}</option>)}
+                     </select>
+                     <button 
+                        onClick={() => setShowReport(true)}
+                        className="px-6 py-2 text-black bg-amber-500 rounded-md hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold"
+                     >
+                        عرض التقرير
+                     </button>
+                 </div>
 
-                 {selectedGovData && <GovernorateReport governorate={selectedGovData} />}
+                 {showReport && selectedGovData && <GovernorateReport governorate={selectedGovData} />}
             </Card>
 
             <Card>

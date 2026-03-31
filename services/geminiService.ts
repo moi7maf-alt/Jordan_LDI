@@ -21,11 +21,62 @@ interface ChatResponse {
     sources: ChatMessageSource[];
 }
 
-export const getChatResponse = async (prompt: string): Promise<ChatResponse> => {
+// Cache configuration
+const CACHE_PREFIX = 'gemini_cache_';
+const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+const getCache = <T>(key: string): T | null => {
     try {
+        const cached = localStorage.getItem(CACHE_PREFIX + key);
+        if (!cached) return null;
+        
+        const { value, expiry } = JSON.parse(cached);
+        if (new Date().getTime() > expiry) {
+            localStorage.removeItem(CACHE_PREFIX + key);
+            return null;
+        }
+        console.log(`[Gemini Cache] Hit for key: ${key}`);
+        return value as T;
+    } catch (e) {
+        return null;
+    }
+};
+
+const setCache = <T>(key: string, value: T): void => {
+    try {
+        const item = {
+            value,
+            expiry: new Date().getTime() + CACHE_TTL,
+        };
+        localStorage.setItem(CACHE_PREFIX + key, JSON.stringify(item));
+        console.log(`[Gemini Cache] Saved for key: ${key}`);
+    } catch (e) {
+        // If localStorage is full, clear old cache items
+        if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+            clearOldCache();
+        }
+    }
+};
+
+const clearOldCache = () => {
+    console.log('[Gemini Cache] Clearing old cache due to storage limits');
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key?.startsWith(CACHE_PREFIX)) {
+            localStorage.removeItem(key);
+        }
+    }
+};
+
+export const getChatResponse = async (prompt: string): Promise<ChatResponse> => {
+    const cacheKey = `chat_${prompt.substring(0, 100)}`;
+    const cached = getCache<ChatResponse>(cacheKey);
+    if (cached) return cached;
+
+    const result = await withRetry(async () => {
         const ai = getAiInstance();
         const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+            model: "gemini-flash-latest",
             contents: prompt,
             config: {
                 tools: [{googleSearch: {}}],
@@ -43,20 +94,23 @@ export const getChatResponse = async (prompt: string): Promise<ChatResponse> => 
             .filter((source: ChatMessageSource) => source.uri);
 
         return { text, sources };
+    }, 3, 2000);
 
-    } catch (error) {
-        console.error("Error getting chat response from Gemini:", error);
-        throw new Error("Failed to communicate with the AI assistant. Please try again later.");
-    }
+    setCache(cacheKey, result);
+    return result;
 };
 
 export const generateReportSummary = async (topic: string): Promise<string> => {
-    try {
+    const cacheKey = `report_summary_${topic}`;
+    const cached = getCache<string>(cacheKey);
+    if (cached) return cached;
+
+    const result = await withRetry(async () => {
         const ai = getAiInstance();
         const fullPrompt = `Generate a concise analytical report on the following topic related to Jordan's development: "${topic}". The report should be well-structured, data-driven (using hypothetical but realistic data points if necessary), and provide actionable insights. The output should be in Arabic.`;
         
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-pro',
+            model: 'gemini-flash-latest',
             contents: fullPrompt,
             config: {
                 temperature: 0.5,
@@ -64,10 +118,10 @@ export const generateReportSummary = async (topic: string): Promise<string> => {
         });
 
         return response.text;
-    } catch (error) {
-        console.error("Error generating report from Gemini:", error);
-        throw new Error("Failed to generate the report. Please check the topic and try again.");
-    }
+    });
+
+    setCache(cacheKey, result);
+    return result;
 };
 
 export interface GovernorateReportData {
@@ -75,8 +129,17 @@ export interface GovernorateReportData {
     population?: number;
     density?: number;
     unemploymentRate?: number;
+    unemploymentNote?: string;
     nationalUnemploymentRate?: number;
+    nationalStudentTeacherRatio?: number;
+    nationalBedsPer10k?: number;
+    nationalWaterPerCapita?: number;
+    nationalSanitationCoverage?: number;
     avgIncome?: number;
+    nationalAvgIncome?: number;
+    nationalGPRate?: number;
+    nationalNurseRate?: number;
+    nationalInfantMortality?: number;
     studentTeacherRatio?: number;
     studentClassroomRatio?: number;
     rentedSchoolsPercentage?: number;
@@ -102,86 +165,170 @@ export interface GovernorateReportData {
     nursesPer10k?: number;
     cancerRatePer100k?: number;
     infantMortality?: number;
+    // Health Rates (per 1000 pop)
+    specialistRate?: number;
+    gpRate?: number;
+    dentistRate?: number;
+    pharmacistRate?: number;
+    nurseRate?: number;
+    // Additional Data
+    livestock?: {
+        sheep?: number;
+        goats?: number;
+        cattle?: number;
+        camels?: number;
+    };
+    economicDev?: {
+        total_projects?: number;
+        total_investment?: number;
+        job_opportunities?: number;
+    };
 }
 
-export const generateGovernorateReport = async (data: GovernorateReportData): Promise<string> => {
+export interface GovernorateReportResponse {
+    report: string;
+    allocations: {
+        name: string;
+        value: number;
+        color: string;
+    }[];
+    allocationJustification: string; // مبررات توزيع المخصصات
+    swot: {
+        strengths: string[];
+        weaknesses: string[];
+        opportunities: string[];
+        threats: string[];
+    };
+    strategicPlan: {
+        vision: string;
+        mission: string;
+        goals: {
+            goal: string;
+            projects: {
+                name: string;
+                justification: string; // مبرر المشروع بناءً على البيانات
+                kpi: string; // مؤشر قياس الأداء
+            }[];
+        }[];
+    };
+}
+
+const withRetry = async <T>(fn: () => Promise<T>, retries = 3, delay = 2000): Promise<T> => {
     try {
+        return await fn();
+    } catch (error: any) {
+        const isQuotaError = 
+            error.message?.includes('429') || 
+            error.message?.includes('quota') ||
+            error.message?.includes('RESOURCE_EXHAUSTED') ||
+            error.status === 'RESOURCE_EXHAUSTED' ||
+            JSON.stringify(error).toLowerCase().includes('quota') ||
+            JSON.stringify(error).includes('RESOURCE_EXHAUSTED') ||
+            JSON.stringify(error).includes('429');
+
+        if (retries > 0 && isQuotaError) {
+            console.warn(`Gemini API Quota exceeded. Retrying in ${delay}ms... (${retries} retries left)`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return withRetry(fn, retries - 1, delay * 2);
+        }
+
+        if (isQuotaError) {
+            throw new Error("لقد تجاوزت الحصة المسموح بها لاستخدام الذكاء الاصطناعي (Quota Exceeded). يرجى الانتظار قليلاً ثم المحاولة مرة أخرى، أو التحقق من خطة الدفع الخاصة بك.");
+        }
+        
+        console.error("Gemini API Error:", error);
+        throw error;
+    }
+};
+
+export const generateGovernorateReport = async (data: GovernorateReportData): Promise<GovernorateReportResponse> => {
+    const cacheKey = `gov_report_${data.governorateName}`;
+    const cached = getCache<GovernorateReportResponse>(cacheKey);
+    if (cached) return cached;
+
+    const result = await withRetry(async () => {
         const ai = getAiInstance();
         const prompt = `
-أنت باحث استراتيجي أول في التخطيط التنموي. قم بإعداد "وثيقة تنموية شاملة ومعمقة" لمحافظة **${data.governorateName}**.
+أنت "كبير مستشاري التخطيط الاستراتيجي" في وزارة الإدارة المحلية الأردنية، ومكلف بإعداد **وثيقة تنموية شاملة وموسعة** لمحافظة **${data.governorateName}** لتقديمها لمتخذي القرار.
 
-**التعليمات الصارمة:**
-1.  **الأسلوب:** أكاديمي رصين، بحثي مكثف، ولغة تخطيط استراتيجي عالية المستوى.
-2.  **بدون مقدمات:** ابدأ التقرير فوراً بالعنوان الرئيسي ومحتوى القسم الأول. **لا تكتب عبارات مثل "بصفتي خبيراً..." أو "يسعدني إعداد هذا التقرير" أو "إليك التقرير التالي" أو أي مقدمات شخصية.** ادخل في صلب الموضوع مباشرة.
-3.  **الحجم:** توسع في الشرح والتحليل قدر الإمكان (لا تختصر). كل قسم يجب أن يحتوي على تحليل معمق للأرقام وتداعياتها.
-4.  **البيانات:** استخدم البيانات المرفقة أدناه كنقاط انطلاق للتحليل، واربطها بالسياق الديموغرافي والاقتصادي للمحافظة.
+**الهدف:** تحويل البيانات الإحصائية إلى رؤية استراتيجية متكاملة في تقرير تنموي شامل وموسع، يهدف إلى توجيه الاستثمارات وتطوير الخدمات بأسلوب مهني رفيع.
 
-**البيانات المرجعية:**
-*   ديموغرافيا: السكان ${data.population?.toLocaleString()} نسمة، الكثافة ${data.density?.toFixed(1)} نسمة/كم².
-*   الاقتصاد: البطالة ${data.unemploymentRate?.toFixed(1)}% (الوطني ${data.nationalUnemploymentRate?.toFixed(1)}%)، الدخل ${data.avgIncome?.toLocaleString()} دينار.
-*   التعليم: طالب/معلم ${data.studentTeacherRatio?.toFixed(1)}، اكتظاظ ${data.studentClassroomRatio?.toFixed(1)}، مدارس مستأجرة ${data.rentedSchoolsPercentage?.toFixed(1)}%.
-*   الصحة: ${data.bedsPer10k?.toFixed(1)} سرير/10 آلاف، ${data.doctorsPer10k?.toFixed(1)} طبيب/10 آلاف، وفيات الرضع ${data.infantMortality || 'N/A'}.
-*   البنية التحتية: مياه ${data.waterPerCapita?.toFixed(1)} م³، صرف صحي ${data.sanitationCoverage?.toFixed(1)}%، حوادث ${data.trafficAccidents}.
+**التعليمات الصارمة لضمان المصداقية والعمق:**
+1.  **المنهجية:** استخدم أسلوب التحليل الرباعي (SWOT) والتحليل القطاعي المعمق. يجب أن يكون النص غنياً بالمصطلحات التنموية (مثل: الميزة التنافسية، الفجوة التنموية، الاستدامة المالية، رأس المال البشري).
+2.  **البيانات:** **ممنوع تماماً اختراع أرقام**. استخدم البيانات المرفقة أدناه كمرجعية وحيدة للأرقام. حلل "الأثر المتوقع" بناءً على الواقع الجغرافي والاقتصادي المعروف للمحافظة في الأردن.
+3.  **الهيكل التفصيلي للتقرير (يجب أن يظهر في حقل "report"):**
+    *   **■ الأول: المشهد الديموغرافي والاجتماعي (2025):** تحليل الكثافة السكانية وأثرها على الضغط الخدمي.
+    *   **■ الثاني: الواقع الاقتصادي وسوق العمل (2024):** تحليل معمق لمعدلات البطالة (الوطنية والمحلية) وأسباب التفاوت، مع تحليل متوسط الدخل والقوة الشرائية.
+    *   **■ الثالث: قطاع التعليم ورأس المال البشري:** تحليل الاكتظاظ، المدارس المستأجرة، والتعليم المهني وأثره على مخرجات سوق العمل.
+    *   **■ الرابع: المنظومة الصحية والخدمات الطبية:** تحليل كفاية الأسرة والكوادر الطبية مقارنة بالمعايير.
+    *   **■ الخامس: البنية التحتية والموارد المستدامة:** تحليل حصة الفرد من المياه، تغطية الصرف الصحي، والسلامة المرورية.
+    *   **■ السادس: القطاعات الواعدة (الزراعة، السياحة، الصناعة):** استعراض الميزة التنافسية للمحافظة.
+    *   **■ السابع: المقارنة المعيارية (Benchmarking Analysis):** مقارنة أداء المحافظة بالمتوسط الوطني في المؤشرات الرئيسية (البطالة، التعليم، الصحة، المياه).
+    *   **■ الثامن: التنبؤ بالاحتياجات المستقبلية (Future Needs 2030):** تقدير الاحتياجات من المدارس، المستشفيات، والمياه بناءً على النمو السكاني المتوقع.
+    *   **■ التاسع: خارطة الفرص الاستثمارية (Investment Opportunity Map):** اقتراح 3 مشاريع كبرى ذات ميزة تنافسية عالية بناءً على موارد المحافظة.
+    *   **■ العاشر: مصفوفة المخاطر التنموية (Development Risk Matrix):** تحديد المخاطر (اقتصادية، اجتماعية، بيئية) واقتراح سياسات التخفيف.
+    *   **■ الحادي عشر: التوصيات الاستراتيجية والمشاريع المقترحة:** حلول عملية لمعالجة نقاط الضعف المرصودة.
 
-**هيكلية التقرير المطلوبة (التزم بالعناوين بدقة):**
+4.  **المشاريع:** يجب أن يكون كل مشروع مقترح "استجابة مباشرة" لرقم ضعيف في البيانات.
 
-### 1. الخصائص الديموغرافية والسكانية
-(اكتب فقرة مطولة ومفصلة تحلل الحجم السكاني للمحافظة (${data.population}) مقارنة بمساحتها والكثافة السكانية (${data.density}). ناقش الهيكل العمري المتوقع (مجتمع فتي)، معدلات الإعالة، وأثر النمو السكاني واللجوء السوري (إن وجد) على الضغط على الموارد والخدمات. ناقش اتجاهات الهجرة الداخلية من وإلى المحافظة).
+**البيانات المرجعية الدقيقة:**
+*   **السكان (تقدير 2025):** ${data.population?.toLocaleString()} نسمة | الكثافة: ${data.density?.toFixed(1)} نسمة/كم².
+*   **الاقتصاد (2024):** البطالة ${data.unemploymentRate?.toFixed(1)}% (الوطني ${data.nationalUnemploymentRate?.toFixed(1)}%) ${data.unemploymentNote ? `| ملاحظة: ${data.unemploymentNote}` : ''} | الدخل: ${data.avgIncome?.toLocaleString()} دينار (الوطني: ${data.nationalAvgIncome?.toLocaleString()} دينار).
+*   **التعليم:** طالب/معلم: ${data.studentTeacherRatio?.toFixed(1)} (الوطني: ${data.nationalStudentTeacherRatio?.toFixed(1)}) | اكتظاظ: ${data.studentClassroomRatio?.toFixed(1)} | مدارس مستأجرة: ${data.rentedSchoolsPercentage?.toFixed(1)}%.
+*   **الصحة:** ${data.bedsPer10k?.toFixed(1)} سرير/10 آلاف (الوطني: ${data.nationalBedsPer10k?.toFixed(1)}) | ${data.doctorsPer10k?.toFixed(1)} طبيب/10 آلاف | وفيات الرضع: ${data.infantMortality || 'غير متوفر'} (الوطني: ${data.nationalInfantMortality || '14.0'}).
+*   **الكوادر (لكل 1000):** اختصاص (${data.specialistRate?.toFixed(4)}) | عام (${data.gpRate?.toFixed(4)} | الوطني: ${data.nationalGPRate?.toFixed(4)}) | أسنان (${data.dentistRate?.toFixed(4)}) | تمريض (${data.nurseRate?.toFixed(1)} | الوطني: ${data.nationalNurseRate?.toFixed(1)}).
+*   **الثروة الحيوانية:** ضأن (${data.livestock?.sheep?.toLocaleString()}) | ماعز (${data.livestock?.goats?.toLocaleString()}) | أبقار (${data.livestock?.cattle?.toLocaleString()}) | إبل (${data.livestock?.camels?.toLocaleString()}).
+*   **التنمية الاقتصادية:** عدد المشاريع (${data.economicDev?.total_projects}) | حجم الاستثمار (${data.economicDev?.total_investment?.toLocaleString()} دينار) | فرص العمل المستحدثة (${data.economicDev?.job_opportunities}).
+*   **البنية التحتية:** مياه: ${data.waterPerCapita?.toFixed(1)} م³ (الوطني: ${data.nationalWaterPerCapita?.toFixed(1)}) | صرف صحي: ${data.sanitationCoverage?.toFixed(1)}% (الوطني: ${data.nationalSanitationCoverage?.toFixed(1)}) | حوادث: ${data.trafficAccidents}.
 
-### 2. واقع القطاعات الخدمية والاجتماعية
-(تحليل شامل ومدمج للقطاعات التالية: التعليم، الصحة، الإدارة المحلية، والتنمية الاجتماعية).
-*   **التعليم:** حلل كفاءة النظام التعليمي (نسب المعلمين، المدارس المستأجرة) وأثرها على جودة المخرجات.
-*   **الصحة:** قيم كفاية الخدمات الصحية (الأسرة، الأطباء) ومدى تغطيتها للتجمعات السكانية.
-*   **التنمية الاجتماعية:** ناقش جيوب الفقر والحاجة لبرامج الرعاية والحماية الاجتماعية.
-
-### 3. واقع القطاعات الإنتاجية والاقتصادية
-(تحليل موسع للقطاعات المولدة للدخل: الزراعة، السياحة، الصناعة، والتكنولوجيا).
-*   ناقش معدلات البطالة (${data.unemploymentRate}%) في سياق ضعف القاعدة الإنتاجية.
-*   حلل الميزات النسبية للمحافظة (هل هي زراعية، صناعية، أم سياحية؟) وكيفية استغلالها حالياً.
-*   قيم بيئة الاستثمار ودعم المشاريع الصغيرة والمتوسطة.
-
-### 4. واقع قطاعات البنية التحتية
-(تحليل فني لقطاعات: المياه، الطاقة، الطرق والنقل، والصرف الصحي).
-*   ناقش الأمن المائي وحصة الفرد (${data.waterPerCapita}) وتحديات التزود.
-*   قيم تغطية الصرف الصحي (${data.sanitationCoverage}%) وأثرها البيئي.
-*   حلل وضع شبكات الطرق والسلامة المرورية بناءً على عدد الحوادث (${data.trafficAccidents}).
-
-### 5. التحليل الاستراتيجي (SWOT Analysis)
-(قم بفصل كل جزء في فقرة مستقلة ومفصلة):
-*   **نقاط القوة (Strengths):** الموارد البشرية والطبيعية والميزات التنافسية الكامنة.
-*   **نقاط الضعف (Weaknesses):** التحديات الهيكلية، نقص التمويل، ضعف البنية التحتية.
-*   **الفرص (Opportunities):** المشاريع الوطنية، التوجهات العالمية، الاستثمارات المحتملة.
-*   **التهديدات (Threats):** التغير المناخي، شح التمويل، الهجرات، التحديات الإقليمية.
-
-### 6. الخطة التنموية المقترحة (2025-2030)
-(هام جداً: لا تستخدم الجداول. قم بصياغة الخطة على شكل **كتل نصية مرتبة عمودياً** لكل مبادرة، بحيث تكون واضحة ومفصلة. التزم بالتنسيق التالي بدقة وكرره لـ 5 مبادرات على الأقل):
-
-**الهدف الاستراتيجي:** (صغ هدفاً استراتيجياً دقيقاً)
-**المشروع/البرنامج المقترح:** (اذكر اسم المشروع وتفاصيله)
-**مؤشر قياس الأداء (KPI):** (مؤشر رقمي لقياس النجاح)
-**الإطار الزمني:** (مثال: 2025-2026)
-
----
-
-**الهدف الاستراتيجي:** ...
-(وهكذا لباقي المبادرات)
-
-**ملاحظة:** يجب أن يكون المحتوى غنياً جداً بالتحليل، ولا تستخدم عبارات عامة، بل اربط كل تحليل بالأرقام المتوفرة وخصوصية المحافظة.
-        `;
+**المطلوب ناتج JSON بالهيكل التالي:**
+{
+  "report": "نص التقرير التنموي الشامل (Markdown). يجب أن يكون التقرير مفصلاً ودقيقاً، يغطي كافة الفصول الـ 11 المذكورة أعلاه بعمق. ركز على التحليل الاستراتيجي والربط بين الأرقام وتقديم رؤية تدعم اتخاذ القرار.",
+  "allocations": [
+    {"name": "القطاعات الاجتماعية والخدمية", "value": number, "color": "#E0F2FE"},
+    {"name": "القطاعات الاقتصادية والإنتاجية", "value": number, "color": "#DCFCE7"},
+    {"name": "البنية التحتية والاستدامة البيئية", "value": number, "color": "#FFF9E5"}
+  ],
+  "allocationJustification": "تحليل استراتيجي لمبررات توزيع الميزانية بناءً على الأولويات القصوى المكتشفة، مع مراعاة دمج 'التشغيل' ضمن القطاعات الاقتصادية والإنتاجية، ودمج 'التدريب' ضمن القطاعات الاجتماعية والخدمية (التعليم).",
+  "swot": {
+    "strengths": ["نقاط قوة حقيقية مستمدة من البيانات والجغرافيا"],
+    "weaknesses": ["نقاط ضعف مستمدة من الأرقام الضعيفة في البيانات"],
+    "opportunities": ["فرص مرتبطة برؤية التحديث الاقتصادي 2033"],
+    "threats": ["تحديات خارجية مثل التغير المناخي أو الهجرات القسرية"]
+  },
+  "strategicPlan": {
+    "vision": "رؤية طموحة للمحافظة (2026-2033)",
+    "mission": "رسالة مؤسسية واضحة",
+    "goals": [
+      {
+        "goal": "هدف استراتيجي كبير",
+        "projects": [
+          {
+            "name": "اسم مشروع تنموي ضخم", 
+            "justification": "ربط المشروع مباشرة ببيانات المحافظة (مثلاً: سد الفجوة في قطاع X)",
+            "kpi": "مؤشر أداء رقمي قابل للقياس"
+          }
+        ]
+      }
+    ]
+  }
+}
+`;
 
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-pro',
+            model: 'gemini-flash-latest',
             contents: prompt,
             config: {
-                temperature: 0.4, // Slightly higher for creative planning but still grounded
+                temperature: 0.3,
+                responseMimeType: 'application/json',
             }
         });
 
-        return response.text;
-    } catch (error) {
-        console.error(`Error generating report for ${data.governorateName}:`, error);
-        throw new Error(`Failed to generate the report for ${data.governorateName}. Please try again.`);
-    }
+        return JSON.parse(response.text) as GovernorateReportResponse;
+    });
+
+    setCache(cacheKey, result);
+    return result;
 };
 
 export interface ComparativeGovData {
@@ -200,7 +347,11 @@ export interface ComparativeGovData {
 }
 
 export const generateComparativeAnalysis = async (gov1: ComparativeGovData, gov2: ComparativeGovData): Promise<string> => {
-    try {
+    const cacheKey = `comp_analysis_${gov1.name_ar}_${gov2.name_ar}`;
+    const cached = getCache<string>(cacheKey);
+    if (cached) return cached;
+
+    const result = await withRetry(async () => {
         const ai = getAiInstance();
         const prompt = `
 أنت خبير استراتيجي في التنمية المحلية المستدامة ومخطط حضري متخصص في الشأن الأردني.
@@ -247,7 +398,7 @@ export const generateComparativeAnalysis = async (gov1: ComparativeGovData, gov2
         `;
 
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-flash-latest',
             contents: prompt,
             config: {
                 responseMimeType: 'application/json',
@@ -256,15 +407,19 @@ export const generateComparativeAnalysis = async (gov1: ComparativeGovData, gov2
         });
 
         return response.text;
-    } catch (error) {
-        console.error(`Error generating comparative analysis for ${gov1.name_ar} and ${gov2.name_ar}:`, error);
-        throw new Error(`Failed to generate the analysis. Please try again.`);
-    }
+    });
+
+    setCache(cacheKey, result);
+    return result;
 };
 
 
 export const generateProjectAnalysis = async (projectIdea: string, governorate: string): Promise<string> => {
-    try {
+    const cacheKey = `proj_analysis_${projectIdea}_${governorate}`;
+    const cached = getCache<string>(cacheKey);
+    if (cached) return cached;
+
+    const result = await withRetry(async () => {
         const ai = getAiInstance();
         const prompt = `
 أنت خبير في التخطيط الاستراتيجي والتنمية المحلية في الأردن. قم بتحليل فكرة المشروع التنموي التالية لمحافظة ${governorate}:
@@ -293,7 +448,7 @@ export const generateProjectAnalysis = async (projectIdea: string, governorate: 
 `;
 
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-pro',
+            model: 'gemini-flash-latest',
             contents: prompt,
             config: {
                 temperature: 0.6,
@@ -301,21 +456,37 @@ export const generateProjectAnalysis = async (projectIdea: string, governorate: 
         });
 
         return response.text;
-    } catch (error) {
-        console.error(`Error generating project analysis for ${governorate}:`, error);
-        throw new Error('Failed to generate the project analysis. Please try again.');
-    }
+    });
+
+    setCache(cacheKey, result);
+    return result;
 };
 
-export const analyzeEconomicVisionAlignment = async (projectIdea: string, governorate: string): Promise<string> => {
-    try {
+export interface AlignmentAnalysisResponse {
+    score: number;
+    justification: string;
+    report: string;
+}
+
+export const analyzeEconomicVisionAlignment = async (projectIdea: string, governorate: string): Promise<AlignmentAnalysisResponse> => {
+    const cacheKey = `vision_alignment_${projectIdea}_${governorate}`;
+    const cached = getCache<AlignmentAnalysisResponse>(cacheKey);
+    if (cached) return cached;
+
+    const result = await withRetry(async () => {
         const ai = getAiInstance();
+        
+        // Get governorate context from constants if possible
+        // Note: We can't easily import ECONOMIC_VISION_DATA here without circular dependency if we are not careful, 
+        // but we can pass it from the component or just rely on Gemini's knowledge supplemented by the prompt.
+        
         const prompt = `
 أنت خبير استراتيجي متخصص في "رؤية التحديث الاقتصادي الأردنية (2022-2033)". 
 مهمتك هي تحليل مدى مواءمة مشروع لا مركزي مقترح في محافظة ${governorate} مع ركائز وأهداف الرؤية.
 
 **التعليمات الصارمة:**
-1. **بدون مقدمات:** ابدأ التقرير فوراً بالعنوان الرئيسي ومحتوى القسم الأول. **لا تكتب عبارات مثل "بصفتي خبيراً استراتيجياً..." أو "وبعد الاطلاع على فكرة المشروع المقترح، أقدم التقرير التحليلي التالي..." أو أي مقدمات شخصية.** ادخل في صلب الموضوع مباشرة.
+1. **البيانات الحقيقية:** يجب أن يكون التحليل مبرراً ببيانات حقيقية مرتبطة بمحافظة ${governorate} (مثل الميزة التنافسية، التحديات التنموية، القطاعات الواعدة) وليس مجرد افتراضات عامة.
+2. **درجة المواءمة:** يجب تحديد درجة مواءمة رقمية دقيقة من 100.
 
 **البيانات المرجعية للرؤية:**
 - الركائز الاستراتيجية: (1) إطلاق الإمكانات الاقتصادية، (2) تحسين نوعية الحياة.
@@ -331,33 +502,39 @@ export const analyzeEconomicVisionAlignment = async (projectIdea: string, govern
    * **تحسين نوعية الحياة:** كيف يحسن المشروع رفاه المواطن، حماية البيئة، أو الخدمات الأساسية؟
 
 2. **محركات النمو الثمانية:**
-   * حدد أي من المحركات الثمانية يخدمها هذا المشروع بشكل مباشر (مثلاً: الموارد المستدامة، الاستدامة الخضراء، إلخ).
+   * حدد أي من المحركات الثمانية يخدمها هذا المشروع بشكل مباشر.
 
 3. **المواءمة مع الميزة التنافسية للمحافظة:**
-   * افحص مدى مواءمة المشروع مع "الميزة التنافسية" لمحافظة ${governorate} و"القطاعات الواعدة" فيها (مثلاً: إذا كان المشروع في المفرق ويتعلق باللوجستيات، اذكر ذلك بوضوح).
-   * صنف المشروع: (تنموي استثماري) أم (خدمي تقليدي).
+   * افحص مدى مواءمة المشروع مع "الميزة التنافسية" لمحافظة ${governorate} و"القطاعات الواعدة" فيها.
 
-4. **قياس المواءمة والمستهدفات الكلية:**
-   * كيف يساهم المشروع في تحقيق مستهدفات الرؤية (التشغيل، النمو، الاستثمار)؟
-   * أعطِ درجة مواءمة تقديرية من 100% مع تبرير هذه الدرجة.
+4. **التوصيات الاستراتيجية:**
+   * كيف يمكن تطوير المشروع لزيادة أثره التنموي.
 
-5. **توصيات لتعزيز المواءمة:**
-   * قدم توصيات محددة لزيادة مواءمة المشروع مع الرؤية وتحويله من مشروع خدمي إلى تنموي استثماري إذا لزم الأمر.
-
-**ملاحظة:** استخدم لغة تخطيط استراتيجي، وكن دقيقاً في ربط المشروع بالواقع المحلي للمحافظة. استخدم تنسيق Markdown للعناوين والنقاط.
+**يجب أن يكون الناتج بصيغة JSON حصراً بالهيكل التالي:**
+{
+  "score": number (درجة المواءمة من 100),
+  "justification": "نص قصير (جملة أو جملتين) يبرر الدرجة بناءً على البيانات الحقيقية للمحافظة",
+  "report": "التقرير التحليلي الكامل بتنسيق Markdown"
+}
 `;
 
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-pro',
+            model: 'gemini-flash-latest',
             contents: prompt,
             config: {
-                temperature: 0.5,
+                temperature: 0.4,
+                responseMimeType: 'application/json',
             }
         });
 
-        return response.text;
-    } catch (error) {
-        console.error(`Error analyzing economic vision alignment for ${governorate}:`, error);
-        throw new Error('Failed to analyze project alignment with the Economic Vision.');
-    }
+        const result = JSON.parse(response.text);
+        return {
+            score: result.score || 0,
+            justification: result.justification || '',
+            report: result.report || response.text
+        };
+    });
+
+    setCache(cacheKey, result);
+    return result;
 };

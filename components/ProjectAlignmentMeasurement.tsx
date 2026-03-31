@@ -3,15 +3,16 @@ import React, { useState } from 'react';
 import Card from './ui/Card';
 import { ECONOMIC_VISION_DATA } from '../constants/economicVisionData';
 import { GOVERNORATES_DATA } from '../constants';
-import { analyzeEconomicVisionAlignment } from '../services/geminiService';
+import { analyzeEconomicVisionAlignment, AlignmentAnalysisResponse } from '../services/geminiService';
 import { motion } from 'motion/react';
 import { Document, Packer, Paragraph, TextRun, AlignmentType, IStylesOptions, WidthType } from 'docx';
 import saveAs from 'file-saver';
+import ReactMarkdown from 'react-markdown';
 
 const ProjectAlignmentMeasurement: React.FC = () => {
     const [projectIdea, setProjectIdea] = useState('');
     const [selectedGov, setSelectedGov] = useState('Amman');
-    const [analysisResult, setAnalysisResult] = useState('');
+    const [analysisResult, setAnalysisResult] = useState<AlignmentAnalysisResponse | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isExportingDocx, setIsExportingDocx] = useState(false);
@@ -33,10 +34,12 @@ const ProjectAlignmentMeasurement: React.FC = () => {
 
             const children = [
                 new Paragraph({ text: title, style: "h1" }),
+                new Paragraph({ text: `درجة المواءمة: ${analysisResult.score}%`, style: "h2" }),
+                new Paragraph({ text: `التبرير: ${analysisResult.justification}`, style: "Normal" }),
                 new Paragraph({ text: `فكرة المشروع: ${projectIdea}`, style: "Normal" }),
                 new Paragraph({ text: `المحافظة: ${GOVERNORATES_DATA.find(g => g.name === selectedGov)?.name_ar || selectedGov}`, style: "Normal" }),
                 new Paragraph({ text: "نتائج التحليل:", style: "h2" }),
-                ...analysisResult.split('\n').map(line => new Paragraph({ text: line, style: "Normal" }))
+                ...analysisResult.report.split('\n').map(line => new Paragraph({ text: line, style: "Normal" }))
             ];
 
             const doc = new Document({
@@ -74,6 +77,8 @@ const ProjectAlignmentMeasurement: React.FC = () => {
                     }
                     h1 { font-size: 24pt; font-weight: bold; text-align: center; border-bottom: 3px solid #000; margin-bottom: 30px; padding-bottom: 10px; }
                     h2 { font-size: 18pt; font-weight: bold; border-bottom: 1px solid #666; margin-top: 30px; margin-bottom: 15px; }
+                    .score-box { border: 2px solid #amber-600; padding: 15px; margin: 20px 0; text-align: center; background: #fffbeb; }
+                    .score-value { font-size: 36pt; font-weight: bold; color: #d97706; }
                     .meta { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
                     @page { size: A4; margin: 1.5cm; }
                 </style>
@@ -89,7 +94,12 @@ const ProjectAlignmentMeasurement: React.FC = () => {
                         <p><strong>فكرة المشروع:</strong> ${projectIdea}</p>
                         <p><strong>المحافظة:</strong> ${GOVERNORATES_DATA.find(g => g.name === selectedGov)?.name_ar || selectedGov}</p>
                     </div>
-                    <div style="white-space: pre-wrap;">${analysisResult}</div>
+                    <div class="score-box">
+                        <div style="font-size: 14pt; color: #666;">درجة المواءمة</div>
+                        <div class="score-value">${analysisResult.score}%</div>
+                        <p><strong>التبرير:</strong> ${analysisResult.justification}</p>
+                    </div>
+                    <div style="white-space: pre-wrap;">${analysisResult.report}</div>
                 </body>
             </html>
         `;
@@ -112,7 +122,7 @@ const ProjectAlignmentMeasurement: React.FC = () => {
         }
         setIsLoading(true);
         setError(null);
-        setAnalysisResult('');
+        setAnalysisResult(null);
 
         try {
             const result = await analyzeEconomicVisionAlignment(projectIdea, selectedGov);
@@ -122,6 +132,18 @@ const ProjectAlignmentMeasurement: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const getScoreColor = (score: number) => {
+        if (score >= 80) return 'text-emerald-600 dark:text-emerald-400';
+        if (score >= 50) return 'text-amber-600 dark:text-amber-400';
+        return 'text-red-600 dark:text-red-400';
+    };
+
+    const getScoreBg = (score: number) => {
+        if (score >= 80) return 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800/50';
+        if (score >= 50) return 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800/50';
+        return 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800/50';
     };
 
     const currentGovContext = (ECONOMIC_VISION_DATA.governorates_context as any)[selectedGov];
@@ -275,7 +297,7 @@ const ProjectAlignmentMeasurement: React.FC = () => {
             </div>
 
             {/* AI Alignment Tool */}
-            <Card id="alignment-tool" className="border-2 border-amber-500/20 relative overflow-hidden">
+            <Card className="border-2 border-amber-500/20 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
                 <div className="flex items-center gap-3 mb-6 relative z-10">
                     <div className="p-3 bg-amber-500 rounded-lg text-black">
@@ -363,50 +385,64 @@ const ProjectAlignmentMeasurement: React.FC = () => {
                         </div>
                     )}
 
-                            {analysisResult && (
-                                <motion.div 
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    className="mt-8 p-8 bg-white dark:bg-slate-900 border border-amber-500/30 rounded-2xl shadow-xl"
-                                >
-                                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                                        <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
-                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                            </svg>
-                                            <h3 className="text-xl font-bold">تقرير مواءمة المشروع مع الرؤية</h3>
-                                        </div>
-                                        <div className="flex gap-2 w-full sm:w-auto">
-                                            <button
-                                                onClick={handleNativePrint}
-                                                className="flex-1 sm:flex-none flex items-center justify-center px-3 py-1.5 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors text-sm border border-gray-200 dark:border-gray-700"
-                                                title="طباعة التقرير"
-                                            >
-                                                <svg className="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
-                                                </svg>
-                                                طباعة
-                                            </button>
-                                            <button
-                                                onClick={handleExportDocx}
-                                                disabled={isExportingDocx}
-                                                className="flex-1 sm:flex-none flex items-center justify-center px-3 py-1.5 bg-amber-500 text-black rounded-lg hover:bg-amber-600 transition-colors text-sm font-semibold disabled:bg-gray-400"
-                                                title="تحميل التقرير بصيغة DOCX"
-                                            >
-                                                <svg className="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                                </svg>
-                                                {isExportingDocx ? 'جاري التحميل...' : 'تحميل'}
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div className="prose prose-amber dark:prose-invert max-w-none">
-                                        <div className="whitespace-pre-wrap font-sans text-gray-800 dark:text-gray-200 leading-relaxed">
-                                            {analysisResult}
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            )}
+                    {analysisResult && (
+                        <motion.div 
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="mt-8 space-y-6"
+                        >
+                            {/* Score Card */}
+                            <div className={`p-8 rounded-2xl border-2 text-center transition-all ${getScoreBg(analysisResult.score)}`}>
+                                <h3 className="text-lg font-bold text-gray-700 dark:text-gray-300 mb-2">درجة المواءمة الاستراتيجية</h3>
+                                <div className={`text-7xl font-black mb-4 ${getScoreColor(analysisResult.score)}`}>
+                                    {analysisResult.score}%
+                                </div>
+                                <p className="max-w-2xl mx-auto text-gray-700 dark:text-gray-300 font-medium leading-relaxed">
+                                    <span className="font-bold">التبرير: </span>
+                                    {analysisResult.justification}
+                                </p>
+                            </div>
+
+                                     <div className="p-8 bg-white dark:bg-slate-900 border border-amber-500/30 rounded-2xl shadow-xl">
+                                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                                             <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+                                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                 </svg>
+                                                 <h3 className="text-xl font-bold">التقرير التحليلي التفصيلي</h3>
+                                             </div>
+                                             <div className="flex gap-2 w-full sm:w-auto">
+                                                 <button
+                                                     onClick={handleNativePrint}
+                                                     className="flex-1 sm:flex-none flex items-center justify-center px-3 py-1.5 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors text-sm border border-gray-200 dark:border-gray-700"
+                                                     title="طباعة التقرير"
+                                                 >
+                                                     <svg className="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                                                     </svg>
+                                                     طباعة
+                                                 </button>
+                                                 <button
+                                                     onClick={handleExportDocx}
+                                                     disabled={isExportingDocx}
+                                                     className="flex-1 sm:flex-none flex items-center justify-center px-3 py-1.5 bg-amber-500 text-black rounded-lg hover:bg-amber-600 transition-colors text-sm font-semibold disabled:bg-gray-400"
+                                                     title="تحميل التقرير بصيغة DOCX"
+                                                 >
+                                                     <svg className="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                     </svg>
+                                                     {isExportingDocx ? 'جاري التحميل...' : 'تحميل'}
+                                                 </button>
+                                             </div>
+                                         </div>
+                                         <div className="prose prose-amber dark:prose-invert max-w-none">
+                                             <div className="font-sans text-gray-800 dark:text-gray-200 leading-relaxed">
+                                                 <ReactMarkdown>{analysisResult.report}</ReactMarkdown>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </motion.div>
+                    )}
                 </div>
             </Card>
 

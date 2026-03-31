@@ -51,17 +51,17 @@ const NationalIndicators: React.FC = () => {
     // Updated based on "Jordan in Figures 2025" (Data 2024) images
     const indicators = [
         // Demographics (Replaced GDP)
-        { icon: '👥', label: 'عدد السكان (2024)', value: '11,734,000 نسمة', color: 'bg-blue-50', border: 'border-blue-200' },
+        { icon: '👥', label: 'عدد السكان (2025)', value: '11,710,000 نسمة', color: 'bg-blue-50', border: 'border-blue-200' },
         { icon: '📈', label: 'معدل النمو السكاني', value: '1.9%', color: 'bg-emerald-50', border: 'border-emerald-200' },
-        { icon: '🏙️', label: 'الكثافة السكانية', value: '132.1 شخص/كم²', color: 'bg-amber-50', border: 'border-amber-200' },
+        { icon: '🏙️', label: 'الكثافة السكانية', value: '131.7 شخص/كم²', color: 'bg-amber-50', border: 'border-amber-200' },
         
         { icon: '💼', label: 'معدل البطالة العام', value: '21.4%', color: 'bg-rose-50', border: 'border-rose-200' },
-        { icon: '👩‍💼', label: 'معدل بطالة الإناث', value: '32.9%', color: 'bg-purple-50', border: 'border-purple-200' },
-        { icon: '🎓', label: 'بطالة الشباب (15-24 سنة)', value: '46.6%', color: 'bg-red-50', border: 'border-red-200' },
+        { icon: '👩‍💼', label: 'معدل بطالة الإناث', value: '30.7%', color: 'bg-purple-50', border: 'border-purple-200' },
+        { icon: '🎓', label: 'بطالة الشباب (15-24 سنة)', value: '46.1%', color: 'bg-red-50', border: 'border-red-200' },
         
-        { icon: '📉', label: 'المشاركة الاقتصادية للإناث', value: '14.9%', color: 'bg-indigo-50', border: 'border-indigo-200' },
+        { icon: '📉', label: 'المشاركة الاقتصادية للإناث', value: '14.0%', color: 'bg-indigo-50', border: 'border-indigo-200' },
         { icon: '👨‍👩‍👧‍👦', label: 'متوسط حجم الأسرة', value: '4.8 أفراد', color: 'bg-orange-50', border: 'border-orange-200' },
-        { icon: '❤️', label: 'توقع الحياة عند الولادة', value: '75.3 سنة', color: 'bg-cyan-50', border: 'border-cyan-200' },
+        { icon: '❤️', label: 'توقع الحياة عند الولادة', value: '73.3 سنة', color: 'bg-cyan-50', border: 'border-cyan-200' },
         
         { icon: '🍼', label: 'وفيات الرضع (لكل 1000)', value: '14', color: 'bg-pink-50', border: 'border-pink-200' },
         { icon: '⚖️', label: 'إجمالي الجرائم المسجلة', value: totalCrimes.toLocaleString(), color: 'bg-slate-50', border: 'border-slate-200' },
@@ -73,7 +73,7 @@ const NationalIndicators: React.FC = () => {
             <div className="mb-4 flex items-center space-x-2 rtl:space-x-reverse">
                 <div className="w-1 h-8 bg-gradient-to-b from-amber-500 to-orange-600 rounded-full"></div>
                 <h3 className="text-xl font-bold text-gray-900">
-                    لوحة المؤشرات الوطنية (2024)
+                    لوحة المؤشرات الوطنية (2025)
                 </h3>
             </div>
             <div className="grid grid-cols-2 gap-4 flex-1">
@@ -143,7 +143,7 @@ const Dashboard: React.FC = () => {
                         </div>
                         <div className="flex-grow relative bg-slate-50">
                             <iframe 
-                                title="مؤشر التنمية المحلية المستدامة (2024)" 
+                                title="مؤشر التنمية المحلية المستدامة (2025)" 
                                 aria-label="Choropleth map" 
                                 id="datawrapper-chart-8Q9WD" 
                                 src="https://datawrapper.dwcdn.net/8Q9WD/1/" 

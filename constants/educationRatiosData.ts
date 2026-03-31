@@ -11,9 +11,9 @@ export const STUDENT_TEACHER_RATIOS: EducationRatios[] = [
     { name_ar: 'جرش', moe: 14.38, private: 15.01, other_gov: 0.00, unrwa: 30.86, total: 15.39 },
     { name_ar: 'عجلون', moe: 13.69, private: 15.10, other_gov: 0.00, unrwa: 0.00, total: 14.00 },
     { name_ar: 'الكرك', moe: 11.42, private: 13.47, other_gov: 7.68, unrwa: 0.00, total: 11.62 },
-    { name_ar: 'الطفيلة', moe: 10.60, private: 14.25, other_gov: 10.06, unrwa: 0.00, total: 10.71 },
-    { name_ar: 'معان', moe: 15.07, private: 14.13, other_gov: 7.60, unrwa: 0.00, total: 14.11 },
-    { name_ar: 'العقبة', moe: 16.37, private: 13.15, other_gov: 9.29, unrwa: 0.00, total: 15.63 },
+    { name_ar: 'الطفيلة', moe: 11.32, private: 14.13, other_gov: 10.06, unrwa: 0.00, total: 11.49 },
+    { name_ar: 'معان', moe: 10.60, private: 14.25, other_gov: 9.68, unrwa: 0.00, total: 10.71 },
+    { name_ar: 'العقبة', moe: 15.07, private: 14.49, other_gov: 7.60, unrwa: 0.00, total: 14.11 },
 ];
 
 // Source: User-provided image 'معدل طالب لكل شعبة...'

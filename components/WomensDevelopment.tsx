@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
 import Card from './ui/Card';
-import { NATIONAL_AVERAGES_2024, JORDAN_VISION_2033_TARGETS } from '../constants';
+import { NATIONAL_AVERAGES_2025, JORDAN_VISION_2033_TARGETS } from '../constants';
 import { ECONOMIC_EMPOWERMENT_DATA } from '../constants/economicEmpowermentData';
-import { WOMEN_DEV_DATA_2024 } from '../constants/womensDevelopmentData';
+import { WOMEN_DEV_DATA_2024, WOMEN_DEV_DATA_2025 } from '../constants/womensDevelopmentData';
 import EconomicEmpowermentChart from './charts/EconomicEmpowermentChart';
 import GovernorateBarChart from './charts/GovernorateBarChart';
 import { EMPLOYED_WOMEN_DISTRIBUTION_DATA_2024 } from '../constants/employedWomenDistData';
@@ -14,7 +14,7 @@ import saveAs from 'file-saver';
 const reportContent = [
     {
         title: "1. الملخص التنفيذي والأثر الاستراتيجي",
-        content: `يُشكل ملف تمكين المرأة التحدي الأبرز في الهيكل الاقتصادي الأردني، حيث لا تزال مشاركتها الاقتصادية تراوح مكانها عند ${NATIONAL_AVERAGES_2024.female_labor_force_participation.toFixed(1)}%، وهي من أدنى النسب عالمياً، رغم التفوق الأكاديمي الواضح للإناث في كافة المراحل التعليمية. الأثر الاستراتيجي لدمج المرأة لا يقتصر على البعد الحقوقي، بل يتعداه إلى البعد الاقتصادي الكلي؛ إذ تقدر الدراسات أن رفع نسبة المشاركة إلى ${JORDAN_VISION_2033_TARGETS.female_labor_force_participation}% سيضيف ما لا يقل عن مليار دينار للناتج المحلي الإجمالي سنوياً، وسيعزز الأمن المعيشي للأسر الأردنية. إن تعطيل نصف المجتمع عن الإنتاج يمثل هدراً هائلاً للموارد البشرية الوطنية ويعيق تحقيق التنمية المستدامة.`
+        content: `يُشكل ملف تمكين المرأة التحدي الأبرز في الهيكل الاقتصادي الأردني، حيث لا تزال مشاركتها الاقتصادية تراوح مكانها عند ${NATIONAL_AVERAGES_2025.female_labor_force_participation.toFixed(1)}%، وهي من أدنى النسب عالمياً، رغم التفوق الأكاديمي الواضح للإناث في كافة المراحل التعليمية. الأثر الاستراتيجي لدمج المرأة لا يقتصر على البعد الحقوقي، بل يتعداه إلى البعد الاقتصادي الكلي؛ إذ تقدر الدراسات أن رفع نسبة المشاركة إلى ${JORDAN_VISION_2033_TARGETS.female_labor_force_participation}% سيضيف ما لا يقل عن مليار دينار للناتج المحلي الإجمالي سنوياً، وسيعزز الأمن المعيشي للأسر الأردنية. إن تعطيل نصف المجتمع عن الإنتاج يمثل هدراً هائلاً للموارد البشرية الوطنية ويعيق تحقيق التنمية المستدامة.`
     },
     {
         title: "2. الإطار العام للقطاع والمشهد الديموغرافي",
@@ -169,7 +169,7 @@ const WomensDevelopment: React.FC = () => {
             <div id="report-content" className="space-y-8">
                 <header className="text-center border-b border-gray-200 dark:border-gray-700 pb-8 no-print">
                     <h1 className="text-3xl font-bold text-gray-900">التقرير الاستراتيجي لقطاع المرأة</h1>
-                    <p className="text-lg text-gray-700 mt-1">قراءة معمقة في مؤشرات المشاركة والتمكين والتحديات (2024).</p>
+                    <p className="text-lg text-gray-700 mt-1">قراءة معمقة في مؤشرات المشاركة والتمكين والتحديات (2025).</p>
                 </header>
                 
                 {reportContent.map((section, idx) => (
@@ -192,8 +192,8 @@ const WomensDevelopment: React.FC = () => {
                         {idx === 0 && (
                             <div className="flex flex-col justify-center items-center kpi-card-visual mt-6">
                                 <div className="bg-gray-100 p-6 rounded-xl text-center">
-                                    <h3 className="text-lg font-semibold text-gray-800">مشاركة الإناث في القوى العاملة (2024)</h3>
-                                    <p className="text-5xl font-bold text-violet-500 my-2">{NATIONAL_AVERAGES_2024.female_labor_force_participation.toFixed(1)}%</p>
+                                    <h3 className="text-lg font-semibold text-gray-800">مشاركة الإناث في القوى العاملة (2025)</h3>
+                                    <p className="text-5xl font-bold text-violet-500 my-2">{NATIONAL_AVERAGES_2025.female_labor_force_participation.toFixed(1)}%</p>
                                     <p className="text-sm text-gray-600">المعدل الوطني</p>
                                 </div>
                             </div>
@@ -216,12 +216,12 @@ const WomensDevelopment: React.FC = () => {
                         {idx === 2 && (
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-12 no-print mt-6">
                                 <div>
-                                    <p className="text-lg text-gray-700 mb-4">معدل البطالة (إناث)</p>
-                                    <GovernorateBarChart data={WOMEN_DEV_DATA_2024 as any} dataKey="unemployment_rate_f" unit="%" title="معدل البطالة" />
+                                    <p className="text-lg text-gray-700 mb-4">معدل البطالة (إناث - 2025)</p>
+                                    <GovernorateBarChart data={WOMEN_DEV_DATA_2025 as any} dataKey="unemployment_rate_f" unit="%" title="معدل البطالة" />
                                 </div>
                                 <div>
-                                    <p className="text-lg text-gray-700 mb-4">معدل الأمية (إناث)</p>
-                                    <GovernorateBarChart data={WOMEN_DEV_DATA_2024 as any} dataKey="illiteracy_rate_f" unit="%" title="معدل الأمية" />
+                                    <p className="text-lg text-gray-700 mb-4">معدل الأمية (إناث - 2025)</p>
+                                    <GovernorateBarChart data={WOMEN_DEV_DATA_2025 as any} dataKey="illiteracy_rate_f" unit="%" title="معدل الأمية" />
                                 </div>
                             </div>
                         )}

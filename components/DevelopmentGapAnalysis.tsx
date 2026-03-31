@@ -3,7 +3,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import Card from './ui/Card';
 import { generateComparativeAnalysis, ComparativeGovData } from '../services/geminiService';
 import { GOVERNORATES_DATA } from '../constants';
-import { POPULATION_DATA_2024 } from '../constants/populationData';
+import { POPULATION_DATA_2025 } from '../constants/populationData';
 import { EDUCATION_DATA } from '../constants/educationData';
 import { UNEMPLOYMENT_DATA } from '../constants/unemploymentData';
 import { INCOME_DATA } from '../constants/incomeData';
@@ -33,7 +33,7 @@ const crimeDataMap = new Map(CRIME_DATA_2024.map(d => [d.region, d]));
 const useGovernorateComparisonData = (): ComparativeGovData[] => {
     return useMemo(() => {
         return GOVERNORATES_DATA.map(gov => {
-            const popData = POPULATION_DATA_2024.find(p => p.name === gov.name);
+            const popData = POPULATION_DATA_2025.find(p => p.name === gov.name);
             const eduHistory = EDUCATION_DATA.find(e => e.name === gov.name)?.data;
             const latestEdu = eduHistory ? eduHistory[eduHistory.length - 1] : null;
             const unemploymentHistory = UNEMPLOYMENT_DATA.find(u => u.name === gov.name)?.data;
